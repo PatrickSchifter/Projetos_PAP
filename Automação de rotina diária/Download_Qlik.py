@@ -16,7 +16,7 @@ ac_yea = datetime.today().strftime("%Y")
 
 ac_day = int(ac_day)
 ac_day = str(ac_day)
-
+teste = 123
 driver = webdriver.Chrome(
     executable_path=r"K:\CWB\Logistica\Rastreamento\Patrick\Automação\chromedriver_win32\chromedriver.exe")
 
