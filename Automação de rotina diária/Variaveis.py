@@ -18,7 +18,7 @@ all_index = ['Número', 'N.Pré-Nota', 'Emissão', 'Fantasia-Destinatário', 'Ci
 
 indexes = ['Número', 'Data', 'Transportadora', 'Filial', 'Cidade/Estado', 'Ult_Status']
 
-dest_file = r'K:/CWB/Logistica/Rastreamento/Controle de Monitoramento/Automação de Monitoramento/MONITORAMENTO ' + ano_atual + '.xlsx'
+dest_file = r'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/Automação de Monitoramento/MONITORAMENTO ' + ano_atual + '.xlsx'
 
 dias_meses = {
     1: 31,
@@ -111,8 +111,8 @@ from datetime import date
 today = date.today().strftime("%d-%m-%Y")
 dest_path = "K:/CWB/Logistica/Rastreamento/Patrick/Storage/" + today
 dia_ontem = int(date.today().strftime('%d')) - 1
-ano_atual = int(date.today().strftime('%Y'))
-yest = date(ano_atual, int(mes_atual), dia_ontem).strftime("%d-%m-%Y")
+ano_atual_i = int(date.today().strftime('%Y'))
+yest = date(ano_atual_i, int(mes_atual), dia_ontem).strftime("%d-%m-%Y")
 
 itens_ign = ['tracking; ', 'success; ', 'message; ', 'header; ', 'remetente; ', 'destinatario; ', 'items; ',
              'item; ',

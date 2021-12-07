@@ -55,6 +55,8 @@ def search_data(mes):
             stat = stat.split(';')
             if cont == 0:
                 inf.append(nro_nf)
+                stat[1] = stat[1][1:11]
+
             if cont == 5:
                 cont = 0
                 info.append(inf)
@@ -69,13 +71,10 @@ def search_data(mes):
             info = []
 
     df_ssw = pd.DataFrame(data=nf, columns=indexes)
-    print(df_ssw)
-    writer = pd.ExcelWriter(path=r'K:/CWB/Logistica/Rastreamento/Patrick/Teste/teste' + mes + '.xlsx', engine='openpyxl')
-    df_ssw.to_excel(excel_writer=writer, index=False)
-    writer.save()
+    df_ssw['Data'] = pd.to_datetime(df_ssw['Data'])
+    # writer = pd.ExcelWriter(path=r'K:/CWB/Logistica/Rastreamento/Patrick/Teste/teste' + mes + '.xlsx', engine='openpyxl')
+    # df_ssw.to_excel(excel_writer=writer, index=False)
+    # writer.save()
 
     return df_ssw
 
-
-search_data(name_m_atual)
-search_data(name_m_ant)

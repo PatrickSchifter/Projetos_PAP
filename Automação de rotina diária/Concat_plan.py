@@ -6,13 +6,13 @@ from openpyxl.styles import NamedStyle, Font, Border, Side, PatternFill
 from openpyxl import Workbook
 
 
-file = r'K:/CWB/Logistica/Rastreamento/Controle de Monitoramento/MONITORAMENTO 2021 v.1.2.xlsx'  # Planilha de Monitoramento
+file = r'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/MONITORAMENTO 2021 v.1.2.xlsx'  # Planilha de Monitoramento
 n_file = partial_path + today + '/Notas_emitidas ' + dataf() + '.xlsx'  # Notas do dia anterior
 
 itens_comp = []
 sheet_names = []
 
-path_plans = 'K:/CWB/Logistica/Rastreamento/Controle de Monitoramento/Dados importantes'
+path_plans = 'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/Dados importantes'
 
 sheet_name = 'Clientes com Agendamento'
 df = pd.read_excel(file, sheet_name=sheet_name, engine='openpyxl')
@@ -78,6 +78,33 @@ else:
     dfs[int(mes_atual) - 1] = pd.concat([dfs[int(mes_atual) - 1], df_n],
                                         keys=all_index)
 
+
+from SSW import name_m_ant, name_m_atual, search_data
+
+ssw_mes = search_data(name_m_atual)
+ssw_mes_m = search_data(name_m_ant)
+
+ssw_mes = ssw_mes[['Número', 'Ult_Status']]
+ssw_mes_m = ssw_mes_m[['Número', 'Ult_Status']]
+
+dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=ssw_mes_m, how='left')
+dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=ssw_mes, how='left')
+
+dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2][['Número', 'N.Pré-Nota', 'Emissão', 'Fantasia-Destinatário', 'Cidade-Destinatário', 'Uf',
+             'Natureza-Fiscal', 'Situação-Fiscal', 'Descrição-Do-Depósito', 'Fantasia_Do_Transportador',
+             'Fantasia-Comissionado', 'Data-De-Coleta', 'Previsão-Entrega', 'D_Entrega', 'Agendamento',
+             'Lead-Time',
+             'Dias-Para-Entrega', 'Resumo', 'Ult_Status']]
+dfs[int(mes_atual) - 2].columns = all_index
+
+dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1][['Número', 'N.Pré-Nota', 'Emissão', 'Fantasia-Destinatário', 'Cidade-Destinatário', 'Uf',
+             'Natureza-Fiscal', 'Situação-Fiscal', 'Descrição-Do-Depósito', 'Fantasia_Do_Transportador',
+             'Fantasia-Comissionado', 'Data-De-Coleta', 'Previsão-Entrega', 'D_Entrega', 'Agendamento',
+             'Lead-Time',
+             'Dias-Para-Entrega', 'Resumo', 'Ult_Status']]
+
+dfs[int(mes_atual) - 1].columns = all_index
+
 cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
 dates = ['C', 'L', 'M', 'N', 'O']
 
@@ -104,7 +131,7 @@ default_style.alignment = Alignment(horizontal='center')
 book.add_named_style(default_style)
 
 try:
-    for x in range(1, len(dfs)):
+    for x in range(1, len(dfs) + 1):
         sheet_name = meses[str(x)] + '-' + ano_atual
         print(sheet_name + ' incluso na planilha')
 
@@ -218,7 +245,7 @@ for c in cols[0:3]:
 
 ws.merge_cells('A4:A5')
 ws.merge_cells('A6:A11')
-ws.merge_cells('A28:A29')
+ws.merge_cells('A29:A30')
 
 print(sheet_names[0] + ' Incluso na Planilha')
 

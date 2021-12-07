@@ -848,3 +848,18 @@ Time: 9:10
 Phone Number: +5541991912238
 Message: Mensagens enviadas
 --------------------
+Date: 7/12/2021
+Time: 14:10
+Phone Number: +5541992452910.0
+Message: Prezado cliente, informamos que seu pedido com a Porto a Porto NF 419966 já saiu para entrega e em breve estará chegando em seu estabelecimento! Obs: Essa é uma mensagem automática, por gentileza não responder.
+--------------------
+Date: 7/12/2021
+Time: 14:10
+Phone Number: +5541998350378
+Message: Prezado representante, informamos que o pedido do cliente BACINO PIZZA ARTESANAL EIRELI, NF 419966 (1187557), está em rota e em breve será entregue! Obs: Essa é uma mensagem automática, por gentileza não responder.
+--------------------
+Date: 7/12/2021
+Time: 14:10
+Phone Number: +5541991912238
+Message: Mensagens enviadas
+--------------------
