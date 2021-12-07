@@ -84,8 +84,19 @@ from SSW import name_m_ant, name_m_atual, search_data
 ssw_mes = search_data(name_m_atual)
 ssw_mes_m = search_data(name_m_ant)
 
-ssw_mes = ssw_mes[['Número', 'Ult_Status']]
-ssw_mes_m = ssw_mes_m[['Número', 'Ult_Status']]
+ssw_mes = ssw_mes[['Número', 'Data', 'Ult_Status']]
+ssw_mes_m = ssw_mes_m[['Número', 'Data', 'Ult_Status']]
+
+
+""" 1º Criar um DF cruzando as NF emitidas com NF no SSW
+    2º Criar um DF com todas as NF incluindo data de recebimento
+"""
+
+n_ssw = ssw_mes.query("Ult_Status == 'MERCADORIA ENTREGUE (01)'") #DF com apenas as notas entregues
+n_ssw1 = ssw_mes_m.query("Ult_Status == 'MERCADORIA ENTREGUE (01)'") #DF com apenas as notas entregues
+
+dfs[int(mes_atual) - 2] = pd.concat([dfs[int(mes_atual) - 2], n_ssw1], ignore_index=True)
+dfs[int(mes_atual) - 21] = pd.concat([dfs[int(mes_atual) - 1], n_ssw], ignore_index=True)
 
 dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=ssw_mes_m, how='left')
 dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=ssw_mes, how='left')
@@ -103,7 +114,10 @@ dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1][['Número', 'N.Pré-Nota', 'Em
              'Lead-Time',
              'Dias-Para-Entrega', 'Resumo', 'Ult_Status']]
 
+
+
 dfs[int(mes_atual) - 1].columns = all_index
+
 
 cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
 dates = ['C', 'L', 'M', 'N', 'O']
