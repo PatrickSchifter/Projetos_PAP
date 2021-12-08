@@ -74,6 +74,9 @@ pyautogui.click(314, 111)
 
 time.sleep(2)
 
+import Download_Qlik
+import Download_Plan_Urano
+import N_Coleta_Veloz
 ######################################################################################
 
 # Localiza a janela do Everest na barra de tarefas e maximiza.
@@ -86,6 +89,8 @@ window = pygetwindow.getWindowsWithTitle(title)[0]
 window.activate()
 window.maximize()
 window.resizeTo(1366, 768)
+
+import Baixar_Notas_Emitidas
 
 # import SSW
 # import Trat_dados_ssw

@@ -12,10 +12,10 @@ name_m_ant = meses[str(int(mes_atual) - 1)].upper() + '-' + str(ano_atual)
 def search_data(mes):
     df = pd.read_excel(path, mes)
     df.columns = all_index
-    df.fillna(0)
+    df.fillna('-')
     df = df.query(
         "Fantasia_Do_Transportador != 'MALBEC' & Fantasia_Do_Transportador != 'URANOLOG' &\
-        Fantasia_Do_Transportador != 'JOHNKE TRANSPORTES' & Fantasia_Do_Transportador > '0' &\
+        Fantasia_Do_Transportador != 'JOHNKE TRANSPORTES' & Fantasia_Do_Transportador != '-' &\
          Fantasia_Do_Transportador != 'ALIANCA' & Fantasia_Do_Transportador != 'GRANDE ADEGA - MATRIZ' &\
           Fantasia_Do_Transportador != 'TRANSFRIOS TRANSP' & Fantasia_Do_Transportador != 'BRINGER DO BRASIL' &\
            Fantasia_Do_Transportador != 'GRANDE ADEGA' & Fantasia_Do_Transportador != 'TRANSFRIOS SP' & D_Entrega == '-'")
@@ -77,4 +77,7 @@ def search_data(mes):
     # writer.save()
 
     return df_ssw
+
+print(search_data(name_m_ant))
+
 

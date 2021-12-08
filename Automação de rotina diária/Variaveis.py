@@ -6,6 +6,12 @@ dia_atual = date.today().strftime('%d')
 ano_atual = date.today().strftime('%Y')
 mes_atual = date.today().strftime('%m')
 
+index_stat = ['Número', 'N.Pré-Nota', 'Emissão', 'Fantasia-Destinatário', 'Cidade-Destinatário', 'Uf',
+             'Natureza-Fiscal', 'Situação-Fiscal', 'Descrição-Do-Depósito', 'Fantasia_Do_Transportador',
+             'Fantasia-Comissionado', 'Data-De-Coleta', 'Previsão-Entrega', 'D_Entrega', 'Agendamento',
+             'Lead-Time',
+             'Dias-Para-Entrega', 'Resumo', 'Status']
+
 today = date.today().strftime("%d-%m-%Y")
 partial_path = "K:/CWB/Logistica/Rastreamento/Patrick/Storage/"
 path_dir_tod = partial_path + today

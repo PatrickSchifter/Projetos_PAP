@@ -863,3 +863,43 @@ Time: 14:10
 Phone Number: +5541991912238
 Message: Mensagens enviadas
 --------------------
+Date: 8/12/2021
+Time: 8:27
+Phone Number: +5541995360827.0
+Message: Prezado cliente, informamos que seu pedido com a Porto a Porto NF 420226 já saiu para entrega e em breve estará chegando em seu estabelecimento! Obs: Essa é uma mensagem automática, por gentileza não responder.
+--------------------
+Date: 8/12/2021
+Time: 8:27
+Phone Number: +5541998350378
+Message: Prezado representante, informamos que o pedido do cliente ATP BARAQUIAS EIRELI, NF 420226 (1187799), está em rota e em breve será entregue! Obs: Essa é uma mensagem automática, por gentileza não responder.
+--------------------
+Date: 8/12/2021
+Time: 8:28
+Phone Number: +5541999862489.0
+Message: Prezado cliente, informamos que seu pedido com a Porto a Porto NF 420227 já saiu para entrega e em breve estará chegando em seu estabelecimento! Obs: Essa é uma mensagem automática, por gentileza não responder.
+--------------------
+Date: 8/12/2021
+Time: 8:28
+Phone Number: +5541998350378
+Message: Prezado representante, informamos que o pedido do cliente ATP COMERCIO DE ALIMENTOS LTDA., NF 420227 (1187800), está em rota e em breve será entregue! Obs: Essa é uma mensagem automática, por gentileza não responder.
+--------------------
+Date: 8/12/2021
+Time: 8:28
+Phone Number: +5541991912238
+Message: Mensagens enviadas
+--------------------
+Date: 8/12/2021
+Time: 14:16
+Phone Number: +5541995211575.0
+Message: Prezado cliente, informamos que seu pedido com a Porto a Porto NF 420244 já saiu para entrega e em breve estará chegando em seu estabelecimento! Obs: Essa é uma mensagem automática, por gentileza não responder.
+--------------------
+Date: 8/12/2021
+Time: 14:16
+Phone Number: +5541998350378
+Message: Prezado representante, informamos que o pedido do cliente MARCELO MACHADO RIBEIRO 00316048704, NF 420244 (1187880), está em rota e em breve será entregue! Obs: Essa é uma mensagem automática, por gentileza não responder.
+--------------------
+Date: 8/12/2021
+Time: 14:16
+Phone Number: +5541991912238
+Message: Mensagens enviadas
+--------------------
