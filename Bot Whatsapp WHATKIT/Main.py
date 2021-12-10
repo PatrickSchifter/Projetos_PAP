@@ -44,29 +44,28 @@ frame.columns = ['Data', 'Número', 'N_Pre_Nota', 'Fantasia Destinatário', 'Fan
                  'Cel_Cliente', 'Celular_Comissionado']
 frame = frame.astype({'N_Pre_Nota': 'int64'})
 frame = frame.fillna(0)
-
+lista_envios = ['BRUNA TEBALDI', 'PAULO HENRIQUE', 'ARYADNE RONCAGLIO MARTINS']
 print(frame)
+
+meu_num = '+5541991912238'
 for row in frame.itertuples(index=True, name='Row'):
-    if row.Fantasia_Comissionado == "PAULO HENRIQUE":
+    if row.Fantasia_Comissionado in lista_envios:
         tel_cli = '+' + str(row.Cel_Cliente)
         msg_cli = 'Prezado cliente, informamos que seu pedido com a Porto a Porto NF {} já saiu para entrega e em breve estará chegando em seu estabelecimento! \n\n\nObs: Essa é uma mensagem automática, por gentileza não responder.'.format(
             row.Número)
         pywhatkit.sendwhatmsg_instantly(phone_no=tel_cli,
-                                        message=msg_cli,
-                                        wait_time=5, tab_close=True, close_time=1)
+                                        message=msg_cli, wait_time=5,
+                                        tab_close=True, close_time=2)
 
         tel_com = '+' + str(row.Celular_Comissionado)
-        msg_com = "Prezado representante, informamos que o pedido do cliente {}, NF {} ({}), está em rota e em breve será entregue! \n\n\nObs: Essa é uma mensagem automática, por gentileza não responder.".format(
+        msg_com = "Prezado representante, informamos que o pedido do cliente {}, NF {} (Pré Nota - {}), está em rota e em breve será entregue! \n\n\nObs: Essa é uma mensagem automática, por gentileza não responder.".format(
             row.Razao_Social, row.Número, row.N_Pre_Nota)
-        pywhatkit.sendwhatmsg_instantly(phone_no=tel_com,
+        pywhatkit.sendwhatmsg_instantly(phone_no=tel_com, wait_time=5,
                                         message=msg_com,
-                                        wait_time=5, tab_close=True, close_time=1)
+                                        tab_close=True, close_time=2)
 
-
-
-pywhatkit.sendwhatmsg_instantly(phone_no='+5541991912238', message='Mensagens enviadas', wait_time=5, tab_close=True,
-                                close_time=1)
-
+pywhatkit.sendwhatmsg_instantly(phone_no=meu_num, message='Mensagens enviadas', wait_time=5, tab_close=True,
+                                close_time=2)
 
 for item in list(os.listdir(path_min)):
     os.remove(path_min + item)

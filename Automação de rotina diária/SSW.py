@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
 from Variaveis import itens_ign, all_index, indexes, meses, mes_atual, ano_atual
+import time
 
 url = 'https://ssw.inf.br/api/tracking'
 cnpj = '00069957000194'
@@ -20,8 +21,12 @@ def search_data(mes):
           Fantasia_Do_Transportador != 'TRANSFRIOS TRANSP' & Fantasia_Do_Transportador != 'BRINGER DO BRASIL' &\
            Fantasia_Do_Transportador != 'GRANDE ADEGA' & Fantasia_Do_Transportador != 'TRANSFRIOS SP' & D_Entrega == '-'")
     nf = []
-
+    conta = 0
     for x in df['Número']:
+        if conta == 20:
+            time.sleep(1/2)
+            conta = 0
+        conta += 1
 
         nro_nf = x
 
@@ -78,6 +83,5 @@ def search_data(mes):
 
     return df_ssw
 
-print(search_data(name_m_ant))
 
 
