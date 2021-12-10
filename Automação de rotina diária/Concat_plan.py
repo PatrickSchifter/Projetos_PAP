@@ -100,9 +100,9 @@ dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].asty
 dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega'].astype(dtype='str', copy=True)
 
 dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].apply(
-    func=lambda val: val[2:9] if len(val) > 11 else val)
+    func=lambda val: val[1:7] + '-' + ano_atual if len(val) > 3 else val)
 dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega'].apply(
-    func=lambda val: val[2:9] if len(val) > 11 else val)
+    func=lambda val: val[1:7] + '-' + ano_atual if len(val) > 3 else val)
 
 # Cruzando as datas de entrega
 # Criação de uma coluna com as datas de entrega e NAN
@@ -153,10 +153,11 @@ dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1][index_stat]
 
 dfs[int(mes_atual) - 1].columns = all_index
 
-#Convertendo D_Entrega para datatime
-dfs[int(mes_atual) - 2]['D_Entrega'] = pd.to_datetime(dfs[int(mes_atual) - 2]['D_Entrega'])
-dfs[int(mes_atual) - 1]['D_Entrega'] = pd.to_datetime(dfs[int(mes_atual) - 1]['D_Entrega'])
-###############################################################################
+# Convertendo D_Entrega para datatime
+dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].apply(lambda _: pd.to_datetime(_,format='%d-%m-%Y', errors='AssertionError'))
+
+dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega'].apply(lambda _: pd.to_datetime(_,format='%d-%m-%Y', errors="AssertionError"))
+##############################################################################
 
 dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega']
 dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega']
