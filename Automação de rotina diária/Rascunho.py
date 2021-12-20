@@ -1,5 +1,8 @@
-import pyautogui
-import time
+import requests
 
-time.sleep(5)
-print(pyautogui.position())
+url = 'https://ssw.inf.br/api/tracking'
+cnpj = '00069957000194'
+
+request = requests.post(url=url, data={'cnpj': cnpj, 'nro_nf': 417461})
+
+print(request.text)

@@ -3,6 +3,10 @@ import pandas as pd
 from Variaveis import itens_ign, all_index, indexes, meses, mes_atual, ano_atual
 import time
 
+notas = [420063, 420058, 420301, 420781, 420792, 420794, 420900, 421332, 421334, 421335, 421341, 421342, 421417, 417461, 418399, 418401, 418577, 418578, 418580, 418872, 419049, 419054, 419360]
+
+start_time = time.time()
+
 url = 'https://ssw.inf.br/api/tracking'
 cnpj = '00069957000194'
 path = r'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/MONITORAMENTO 2021 v.1.2.xlsx'
@@ -24,7 +28,7 @@ def search_data(mes):
     conta = 0
     for x in df['Número']:
         if conta == 20:
-            time.sleep(1/2)
+            time.sleep(1 / 2)
             conta = 0
         conta += 1
 
@@ -57,18 +61,24 @@ def search_data(mes):
                 continue
             elif 'efetiva' in stat:
                 continue
+
             stat = stat.split(';')
             if cont == 0:
-                inf.append(nro_nf)
-                stat[1] = stat[1][1:11]
+                if stat[1][1].isnumeric():
+                    inf.append(nro_nf)
+                    stat[1] = stat[1][1:11]
+                else:
+                    continue
 
             if cont == 5:
                 cont = 0
+                inf.append(stat[1])
                 info.append(inf)
                 inf = []
             else:
                 inf.append(stat[1])
                 cont += 1
+
         try:
             nf.append(info[-1])
         except IndexError:
@@ -77,11 +87,7 @@ def search_data(mes):
 
     df_ssw = pd.DataFrame(data=nf, columns=indexes)
     df_ssw['Data'] = pd.to_datetime(df_ssw['Data'])
-    # writer = pd.ExcelWriter(path=r'K:/CWB/Logistica/Rastreamento/Patrick/Teste/teste' + mes + '.xlsx', engine='openpyxl')
-    # df_ssw.to_excel(excel_writer=writer, index=False)
-    # writer.save()
 
     return df_ssw
 
-
-
+print("--- %s seconds SSW integration ---" % (time.time() - start_time))

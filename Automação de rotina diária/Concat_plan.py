@@ -5,7 +5,9 @@ from openpyxl import load_workbook
 from openpyxl.styles import Alignment
 from openpyxl.styles import NamedStyle, Font, Border, Side, PatternFill
 from openpyxl import Workbook
-from numpy import datetime_as_string
+import time
+
+start_time = time.time()
 
 file = r'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/MONITORAMENTO 2021 v.1.2.xlsx'  # Planilha de Monitoramento
 n_file = partial_path + today + '/Notas_emitidas ' + dataf() + '.xlsx'  # Notas do dia anterior
@@ -48,7 +50,7 @@ try:
             df = pd.read_excel(file, engine='openpyxl', sheet_name=meses[dfss] + '-' + ano_atual)
             df.columns = all_index
         except ValueError:
-            pass
+            continue
 
         dfs.append(df)
 except IndexError:
@@ -82,8 +84,34 @@ else:
 from SSW import name_m_ant, name_m_atual, search_data
 
 ssw_mes = search_data(name_m_atual)
-ssw_mes_m = search_data(name_m_ant)
 
+ssw_mes_m = search_data(name_m_ant)
+e_ssw = ssw_mes.query("Ult_Status == ' MERCADORIA ENTREGUE (01)'")  # DF com apenas as notas entregues
+e_ssw1 = ssw_mes_m.query("Ult_Status == ' MERCADORIA ENTREGUE (01)'")  # DF com apenas as notas entregues
+
+a_ssw = ssw_mes.query("Ult_Status == ' ENTREGA AGENDADA (15)'")  # DF com apenas as notas entregues
+a_ssw1 = ssw_mes_m.query("Ult_Status == ' ENTREGA AGENDADA (15)'")  # DF com apenas as notas entregues
+
+# Fatiamento da informação restando apenas a data.
+a_ssw['Descrição'] = a_ssw['Descrição'].apply(func=lambda val: val[19:26] if len(val) > 5 else '')
+a_ssw1['Descrição'] = a_ssw1['Descrição'].apply(func=lambda val: val[19:26] if len(val) > 5 else '')
+
+print('linha 95 Fatiamento de Informação - Deve vir apenas os números da data')
+print(a_ssw['Descrição'])
+print('linha 95 Fatiamento de Informação - Deve vir apenas os números da data')
+print(a_ssw1['Descrição'])
+# Conversão de datetime para string
+
+e_ssw['Data'] = e_ssw['Data'].astype(dtype='str', copy=True)
+e_ssw1['Data'] = e_ssw1['Data'].astype(dtype='str', copy=True)
+
+# Padronizando a informação para aceite do datetime
+e_ssw['Data'] = e_ssw['Data'].apply(
+    func=lambda val: val[8:12] + '-' + val[5:7] + '-' + val[:4] if len(val) > 3 else val)
+e_ssw1['Data'] = e_ssw1['Data'].apply(
+    func=lambda val: val[8:12] + '-' + val[5:7] + '-' + val[:4] if len(val) > 3 else val)
+
+# Concatenação de Ult Status com a localização
 ssw_mes = ssw_mes[['Número', 'Data', 'Cidade/Estado', 'Ult_Status']]
 ssw_mes['Status'] = ssw_mes['Ult_Status'] + ' - ' + ssw_mes['Cidade/Estado']
 ssw_mes_m = ssw_mes_m[['Número', 'Data', 'Cidade/Estado', 'Ult_Status']]
@@ -93,8 +121,9 @@ ssw_mes_m['Status'] = ssw_mes_m['Ult_Status'] + ' - ' + ssw_mes_m['Cidade/Estado
     2º Criar um DF com todas as NF incluindo data de recebimento
 """
 
-n_ssw = ssw_mes.query("Ult_Status == ' MERCADORIA ENTREGUE (01)'")  # DF com apenas as notas entregues
-n_ssw1 = ssw_mes_m.query("Ult_Status == ' MERCADORIA ENTREGUE (01)'")  # DF com apenas as notas entregues
+# Conversão de datetime para String
+dfs[int(mes_atual) - 2]['Agendamento'] = dfs[int(mes_atual) - 2]['Agendamento'].astype(dtype='str', copy=True)
+dfs[int(mes_atual) - 1]['Agendamento'] = dfs[int(mes_atual) - 1]['Agendamento'].astype(dtype='str', copy=True)
 
 dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].astype(dtype='str', copy=True)
 dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega'].astype(dtype='str', copy=True)
@@ -106,13 +135,14 @@ dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega'].appl
 
 # Cruzando as datas de entrega
 # Criação de uma coluna com as datas de entrega e NAN
-dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=n_ssw1, how='left', on='Número')
-dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=n_ssw, how='left', on='Número')
+dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=e_ssw1, how='left', on='Número')
+dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=e_ssw, how='left', on='Número')
 
 # Replace dos NaN por -
 dfs[int(mes_atual) - 2].fillna('-', inplace=True)
 dfs[int(mes_atual) - 1].fillna('-', inplace=True)
 
+# Conversão de datetime para STR
 dfs[int(mes_atual) - 2]['Data'] = dfs[int(mes_atual) - 2]['Data'].astype(dtype='str', copy=True)
 dfs[int(mes_atual) - 1]['Data'] = dfs[int(mes_atual) - 1]['Data'].astype(dtype='str', copy=True)
 
@@ -126,41 +156,89 @@ dfs[int(mes_atual) - 2]['Data'] = dfs[int(mes_atual) - 2]['B_data'].apply(
 dfs[int(mes_atual) - 1]['Data'] = dfs[int(mes_atual) - 1]['B_data'].apply(
     func=lambda val: val[1:12] if len(val) > 11 else val)
 
+# Replace de ! para ''
 dfs[int(mes_atual) - 2]['Data'] = dfs[int(mes_atual) - 2]['Data'].replace(to_replace='!', value='', regex=True)
 dfs[int(mes_atual) - 1]['Data'] = dfs[int(mes_atual) - 1]['Data'].replace(to_replace='!', value='', regex=True)
 
-dfs[int(mes_atual) - 2]['Data'] = dfs[int(mes_atual) - 2]['Data'].replace(to_replace='!', value='', regex=True)
-dfs[int(mes_atual) - 1]['Data'] = dfs[int(mes_atual) - 1]['Data'].replace(to_replace='!', value='', regex=True)
-
+# Transferindo informação para outra coluna
 dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['Data']
 dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['Data']
 
-dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2][index_stat]
-dfs[int(mes_atual) - 2].columns = all_index
-
-dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1][index_stat]
-
-dfs[int(mes_atual) - 1].columns = all_index
+# Excluindo informação desnecessária
+dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2][all_index]
+dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1][all_index]
 
 # Colocando último Status SSW
 dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=ssw_mes_m, how='left')
 dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=ssw_mes, how='left')
 
+# Substituindo coluna Observações por coluna Status que entrou com o Merge
 dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2][index_stat]
-dfs[int(mes_atual) - 2].columns = all_index
-
 dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1][index_stat]
 
+# Renomeando coluna Status para Observações
+dfs[int(mes_atual) - 2].columns = all_index
 dfs[int(mes_atual) - 1].columns = all_index
 
 # Convertendo D_Entrega para datatime
-dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].apply(lambda _: pd.to_datetime(_,format='%d-%m-%Y', errors='AssertionError'))
+dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].apply(
+    lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
+dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega'].apply(
+    lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
 
-dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega'].apply(lambda _: pd.to_datetime(_,format='%d-%m-%Y', errors="AssertionError"))
-##############################################################################
+# Merge com notas agendadas
+dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=a_ssw, how='left', on='Número')
+dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=a_ssw1, how='left', on='Número')
 
-dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega']
-dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega']
+# Preenchimento dos NA
+dfs[int(mes_atual) - 1]['Descrição'] = dfs[int(mes_atual) - 1]['Descrição'].fillna('')
+dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Descrição'].fillna('')
+
+# Recorte de informação
+dfs[int(mes_atual) - 1]['Agendamento'] = dfs[int(mes_atual) - 1]['Agendamento'].apply(
+    func=lambda val: val[8:10] + val[5:7] + val[2:4] if len(val) > 4 else '')
+dfs[int(mes_atual) - 2]['Agendamento'] = dfs[int(mes_atual) - 2]['Agendamento'].apply(
+    func=lambda val: val[0:10] if len(val) > 4 else '')
+
+# Concatenação de datas de agendamento
+dfs[int(mes_atual) - 1]['Descrição'] = dfs[int(mes_atual) - 1]['Agendamento'] + '!' + dfs[int(mes_atual) - 1][
+    'Descrição']
+dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Agendamento'] + '!' + dfs[int(mes_atual) - 1][
+    'Descrição']
+
+# Replace de ! do agendamento
+dfs[int(mes_atual) - 1]['Descrição'] = dfs[int(mes_atual) - 1]['Descrição'].replace(to_replace='!', value='', regex=True)
+dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Descrição'].replace(to_replace='!', value='', regex=True)
+
+print(
+    'Linha 194 Aqui deve ter a concatenação da Descrição (que está só o número da data) com o agendamento que estará ou - ou a data')
+print(
+    'Linha 194 Aqui deve ter a concatenação da Descrição (que está só o número da data) com o agendamento que estará ou - ou a data')
+print(dfs[int(mes_atual) - 1]['Descrição'])
+print(dfs[int(mes_atual) - 2]['Descrição'])
+
+# Conversão para STR
+dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Descrição'].astype(dtype='str', copy=True)
+dfs[int(mes_atual) - 1]['Descrição'] = dfs[int(mes_atual) - 1]['Descrição'].astype(dtype='str', copy=True)
+
+# Fatiamento da informação e padronizando para aceite de datetime
+
+dfs[int(mes_atual) - 1]['Descrição'] = dfs[int(mes_atual) - 1]['Descrição'].apply(
+    func=lambda val: val[-6:-4] + '-' + val[-4:-2] + '-' + '20' + val[-2:] if len(val) > 1 else '-')
+dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Descrição'].apply(
+    func=lambda val: val[-6:-4] + '-' + val[-4:-2] + '-' + '20' + val[-2:] if len(val) > 1 else '-')
+
+print(' Linha 211 Aqui deve acontecer o fatiamento da informação para deixar a informação final')
+
+# Transferência de informação para posição adequada dentro do DF
+dfs[int(mes_atual) - 1]['Agendamento'] = dfs[int(mes_atual) - 1]['Descrição']
+dfs[int(mes_atual) - 2]['Agendamento'] = dfs[int(mes_atual) - 2]['Descrição']
+
+# Conversão de data de agendamento para Datetime
+dfs[int(mes_atual) - 2]['Agendamento'] = dfs[int(mes_atual) - 2]['Agendamento'].apply(
+    lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
+dfs[int(mes_atual) - 1]['Agendamento'] = dfs[int(mes_atual) - 1]['Agendamento'].apply(
+    lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
 
 cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
 dates = ['C', 'L', 'M', 'N', 'O']
@@ -391,3 +469,4 @@ ws.merge_cells('B105:B106')
 print(sheet_names[1] + ' Incluso na Planilha')
 
 writer.save()
+print("--- %s seconds creation of plan ---" % (time.time() - start_time))
