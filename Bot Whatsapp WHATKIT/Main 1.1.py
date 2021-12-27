@@ -14,10 +14,12 @@ for item in list(os.listdir(dir_path)):
     else:
         df = pd.read_excel(dir_path + item)
         dfs.append(df)
+try:
+    df_not = pd.read_excel(dir_path[:-6] + 'Notas/Notas_Clientes.xls')
+    dfs.append(df_not)
+except:
+    pass
 
-df_not = pd.read_excel(dir_path[:-6] + 'Notas/Notas_Clientes.xls')
-
-dfs.append(df_not)
 
 for x in range(0, len(dfs)):
     df_not = pd.concat(objs=dfs, join='outer')
@@ -91,6 +93,8 @@ for rep in lista_envios:
 
 for item in list(os.listdir(path_min)):
     try:
+
+
         os.remove(path_min + item)
     except PermissionError:
         continue

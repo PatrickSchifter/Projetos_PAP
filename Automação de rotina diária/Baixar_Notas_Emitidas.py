@@ -3,10 +3,11 @@ import pyautogui
 import os
 import time
 from Variaveis import dataf
-
+time.sleep(5)
 pyautogui.rightClick(470, 336)
 pyautogui.click(557, 383)
-pyautogui.click(862, 417)
+time.sleep(2)
+pyautogui.click(862, 440)
 
 time.sleep(5)
 

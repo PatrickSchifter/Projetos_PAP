@@ -1,21 +1,17 @@
 import pandas as pd
-from Variaveis import partial_path, index_stat, all_index, dest_file, dia_atual, ano_atual, mes_atual, today, dataf, \
-    dia_semana
+from Variaveis import index_stat, all_index, dest_file, dia_atual, ano_atual, mes_atual, dia_semana, func, file, n_file, \
+    meses_str, manual_index, aut_index
 from openpyxl import load_workbook
 from openpyxl.styles import Alignment
 from openpyxl.styles import NamedStyle, Font, Border, Side, PatternFill
 from openpyxl import Workbook
 import time
+from DF_LeadTime import df_lead
 
 start_time = time.time()
 
-file = r'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/MONITORAMENTO 2021 v.1.2.xlsx'  # Planilha de Monitoramento
-n_file = partial_path + today + '/Notas_emitidas ' + dataf() + '.xlsx'  # Notas do dia anterior
-
 itens_comp = []
 sheet_names = []
-
-path_plans = 'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/Dados importantes'
 
 sheet_name = 'Clientes com Agendamento'
 df = pd.read_excel(file, sheet_name=sheet_name, engine='openpyxl')
@@ -29,25 +25,13 @@ itens_comp.append(df)
 
 df_n = pd.read_excel(n_file, engine='openpyxl')
 
-meses = {"1": "JANEIRO",
-         "2": "FEVEREIRO",
-         "3": "MARÇO",
-         "4": "ABRIL",
-         "5": "MAIO",
-         "6": "JUNHO",
-         "7": "JULHO",
-         "8": "AGOSTO",
-         "9": "SETEMBRO",
-         "10": "OUTUBRO",
-         "11": "NOVEMBRO",
-         "12": "DEZEMBRO"}
 dfs = []
 
 try:
     for dfss in range(1, 13):
         dfss = str(dfss)
         try:
-            df = pd.read_excel(file, engine='openpyxl', sheet_name=meses[dfss] + '-' + ano_atual)
+            df = pd.read_excel(file, engine='openpyxl', sheet_name=meses_str[dfss] + '-' + ano_atual)
             df.columns = all_index
         except ValueError:
             continue
@@ -56,14 +40,9 @@ try:
 except IndexError:
     pass
 
-index = ['Data-De-Coleta', 'Previsão-Entrega', 'D_Entrega', 'Agendamento', 'Lead-Time',
-         'Dias-Para-Entrega', 'Resumo', 'Enviar-Email']
+df_n.columns = aut_index
 
-df_n.columns = ['Número', 'N.Pré-Nota', 'Emissão', 'Fantasia-Destinatário', 'Cidade-Destinatário', 'Uf',
-                'Natureza-Fiscal', 'Situação-Fiscal', 'Descrição-Do-Depósito', 'Fantasia_Do_Transportador',
-                'Fantasia-Comissionado']
-
-for x in index:
+for x in manual_index:
     df_n[x] = ''
 
 if int(dia_atual) == 1:
@@ -96,10 +75,6 @@ a_ssw1 = ssw_mes_m.query("Ult_Status == ' ENTREGA AGENDADA (15)'")  # DF com ape
 a_ssw['Descrição'] = a_ssw['Descrição'].apply(func=lambda val: val[19:26] if len(val) > 5 else '')
 a_ssw1['Descrição'] = a_ssw1['Descrição'].apply(func=lambda val: val[19:26] if len(val) > 5 else '')
 
-print('linha 95 Fatiamento de Informação - Deve vir apenas os números da data')
-print(a_ssw['Descrição'])
-print('linha 95 Fatiamento de Informação - Deve vir apenas os números da data')
-print(a_ssw1['Descrição'])
 # Conversão de datetime para string
 
 e_ssw['Data'] = e_ssw['Data'].astype(dtype='str', copy=True)
@@ -129,9 +104,9 @@ dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].asty
 dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega'].astype(dtype='str', copy=True)
 
 dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].apply(
-    func=lambda val: val[1:7] + '-' + ano_atual if len(val) > 3 else val)
+    func=lambda val: val[8:10] + '-' + val[5:7] + '-' + val[0:4] if len(val) > 3 else val)
 dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega'].apply(
-    func=lambda val: val[1:7] + '-' + ano_atual if len(val) > 3 else val)
+    func=lambda val: val[8:10] + '-' + val[5:7] + '-' + val[0:4] if len(val) > 3 else val)
 
 # Cruzando as datas de entrega
 # Criação de uma coluna com as datas de entrega e NAN
@@ -152,9 +127,9 @@ dfs[int(mes_atual) - 1]['B_data'] = dfs[int(mes_atual) - 1]['D_Entrega'] + '!' +
 
 # Fatiando a string e deixando somente a data
 dfs[int(mes_atual) - 2]['Data'] = dfs[int(mes_atual) - 2]['B_data'].apply(
-    func=lambda val: val[1:12] if len(val) > 11 else val)
+    func=lambda val: val[0:11] if len(val) > 11 else val)
 dfs[int(mes_atual) - 1]['Data'] = dfs[int(mes_atual) - 1]['B_data'].apply(
-    func=lambda val: val[1:12] if len(val) > 11 else val)
+    func=lambda val: val[0:11] if len(val) > 11 else val)
 
 # Replace de ! para ''
 dfs[int(mes_atual) - 2]['Data'] = dfs[int(mes_atual) - 2]['Data'].replace(to_replace='!', value='', regex=True)
@@ -207,15 +182,10 @@ dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Agendamento'] 
     'Descrição']
 
 # Replace de ! do agendamento
-dfs[int(mes_atual) - 1]['Descrição'] = dfs[int(mes_atual) - 1]['Descrição'].replace(to_replace='!', value='', regex=True)
-dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Descrição'].replace(to_replace='!', value='', regex=True)
-
-print(
-    'Linha 194 Aqui deve ter a concatenação da Descrição (que está só o número da data) com o agendamento que estará ou - ou a data')
-print(
-    'Linha 194 Aqui deve ter a concatenação da Descrição (que está só o número da data) com o agendamento que estará ou - ou a data')
-print(dfs[int(mes_atual) - 1]['Descrição'])
-print(dfs[int(mes_atual) - 2]['Descrição'])
+dfs[int(mes_atual) - 1]['Descrição'] = dfs[int(mes_atual) - 1]['Descrição'].replace(to_replace='!', value='',
+                                                                                    regex=True)
+dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Descrição'].replace(to_replace='!', value='',
+                                                                                    regex=True)
 
 # Conversão para STR
 dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Descrição'].astype(dtype='str', copy=True)
@@ -228,8 +198,6 @@ dfs[int(mes_atual) - 1]['Descrição'] = dfs[int(mes_atual) - 1]['Descrição'].
 dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Descrição'].apply(
     func=lambda val: val[-6:-4] + '-' + val[-4:-2] + '-' + '20' + val[-2:] if len(val) > 1 else '-')
 
-print(' Linha 211 Aqui deve acontecer o fatiamento da informação para deixar a informação final')
-
 # Transferência de informação para posição adequada dentro do DF
 dfs[int(mes_atual) - 1]['Agendamento'] = dfs[int(mes_atual) - 1]['Descrição']
 dfs[int(mes_atual) - 2]['Agendamento'] = dfs[int(mes_atual) - 2]['Descrição']
@@ -238,6 +206,41 @@ dfs[int(mes_atual) - 2]['Agendamento'] = dfs[int(mes_atual) - 2]['Descrição']
 dfs[int(mes_atual) - 2]['Agendamento'] = dfs[int(mes_atual) - 2]['Agendamento'].apply(
     lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
 dfs[int(mes_atual) - 1]['Agendamento'] = dfs[int(mes_atual) - 1]['Agendamento'].apply(
+    lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
+
+# Merge da Planilha de LeadTime
+dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=df_lead, how='left',
+                                   on=['Cidade-Destinatário', 'Uf', 'Fantasia_Do_Transportador'])
+
+# Alocando no Lugar adequado
+dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead_Time']
+dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].apply(
+    lambda val: pd.to_numeric(val, 'coerce', 'integer'))
+
+# Preenchendo NaN
+dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].fillna('-')
+dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].fillna('-')
+
+# Conversão para STR
+dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].astype(dtype='str')
+dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].astype(dtype='str')
+
+# Criação de uma coluna com concatenação da DataColeta com LeadTime
+dfs[int(mes_atual) - 1]['N_Previsão'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'] + '!' + dfs[int(mes_atual) - 1][
+    'Lead-Time']
+dfs[int(mes_atual) - 1]['N_Previsão'] = dfs[int(mes_atual) - 1]['N_Previsão'].apply(func=lambda val: func(val))
+
+# Alocando no lugar adequado
+dfs[int(mes_atual) - 1]['Previsão-Entrega'] = dfs[int(mes_atual) - 1]['N_Previsão']
+
+# Fatiamento de informação
+dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].apply(
+    func=lambda val: val[8:10] + '-' + val[5:7] + '-' + val[0:4] if len(val) > 3 else val)
+
+# Conversão para Datetime
+dfs[int(mes_atual) - 1]['Previsão-Entrega'] = dfs[int(mes_atual) - 1]['Previsão-Entrega'].apply(
+    lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
+dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].apply(
     lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
 
 cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
@@ -267,7 +270,7 @@ book.add_named_style(default_style)
 
 try:
     for x in range(1, len(dfs) + 1):
-        sheet_name = meses[str(x)] + '-' + ano_atual
+        sheet_name = meses_str[str(x)] + '-' + ano_atual
         print(sheet_name + ' incluso na planilha')
 
         if x == 1:

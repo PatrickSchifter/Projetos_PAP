@@ -1,8 +1,8 @@
-import requests
+from Variaveis import calc_data
 
-url = 'https://ssw.inf.br/api/tracking'
-cnpj = '00069957000194'
+print(calc_data(4,12,2021,1))
 
-request = requests.post(url=url, data={'cnpj': cnpj, 'nro_nf': 417461})
-
-print(request.text)
+# for x in range(1, 15):
+#     for y in range(15, 30):
+#         print(f'dia {y} e dias úteis à somar {x}')
+#         print(calc_data(y,12,2021,x), '\n')

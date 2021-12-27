@@ -3,7 +3,8 @@ import pandas as pd
 from Variaveis import itens_ign, all_index, indexes, meses, mes_atual, ano_atual
 import time
 
-notas = [420063, 420058, 420301, 420781, 420792, 420794, 420900, 421332, 421334, 421335, 421341, 421342, 421417, 417461, 418399, 418401, 418577, 418578, 418580, 418872, 419049, 419054, 419360]
+notas = [420063, 420058, 420301, 420781, 420792, 420794, 420900, 421332, 421334, 421335, 421341, 421342, 421417, 417461,
+         418399, 418401, 418577, 418578, 418580, 418872, 419049, 419054, 419360]
 
 start_time = time.time()
 
@@ -89,5 +90,6 @@ def search_data(mes):
     df_ssw['Data'] = pd.to_datetime(df_ssw['Data'])
 
     return df_ssw
+
 
 print("--- %s seconds SSW integration ---" % (time.time() - start_time))
