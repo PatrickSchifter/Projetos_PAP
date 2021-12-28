@@ -2738,3 +2738,23 @@ Time: 9:5
 Phone Number: +5541996201167
 Message: Prezado representante, informamos que as seguintes notas estão em rota de entrega: NF 422432 / Pré-Nota 1190272 - DOM VEGGIE COZINHA VEGETARIANA LTDA NF 422432 / Pré-Nota 1190272 - DOM VEGGIE COZINHA VEGETARIANA LTDA NF 422466 / Pré-Nota 1190159 - CAMARGO & RODRIGUES COMERCIO DE SECOS E MOLHADOS LTDA NF 422567 / Pré-Nota 1190416 - FAMILIA DALLARMI PIZZARIA LTDA Essa é uma mensagem automática, por gentileza não responder.
 --------------------
+Date: 28/12/2021
+Time: 8:5
+Phone Number: +5541998246969.0
+Message: Prezado cliente, informamos que seu pedido com a Porto a Porto NF 422612 já saiu para entrega e em breve estará chegando em seu estabelecimento! Obs: Essa é uma mensagem automática, por gentileza não responder.
+--------------------
+Date: 28/12/2021
+Time: 8:5
+Phone Number: +5541988588786.0
+Message: Prezado cliente, informamos que seu pedido com a Porto a Porto NF 422659 já saiu para entrega e em breve estará chegando em seu estabelecimento! Obs: Essa é uma mensagem automática, por gentileza não responder.
+--------------------
+Date: 28/12/2021
+Time: 8:5
+Phone Number: +5541998246969.0
+Message: Prezado cliente, informamos que seu pedido com a Porto a Porto NF 422674 já saiu para entrega e em breve estará chegando em seu estabelecimento! Obs: Essa é uma mensagem automática, por gentileza não responder.
+--------------------
+Date: 28/12/2021
+Time: 8:6
+Phone Number: +554130166675.0
+Message: Prezado cliente, informamos que seu pedido com a Porto a Porto NF 422671 já saiu para entrega e em breve estará chegando em seu estabelecimento! Obs: Essa é uma mensagem automática, por gentileza não responder.
+--------------------

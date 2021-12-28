@@ -7,6 +7,21 @@ dia_semana = datetime.date.weekday(datetime.date.today())
 ano_tual = int(datetime.date.today().strftime("%Y"))
 
 
+def fatiamento(val):
+    valor = '-'
+    try:
+        qtd = len(val)
+        loc_sep = val.index('!')
+        if qtd > 3:
+            if loc_sep == 10:
+                valor = val[:10]
+            elif loc_sep == 1:
+                valor = val[2:]
+    except TypeError:
+        valor = '-'
+    return valor
+
+
 def data():
     if dia_semana == 0:
         if dia_hoje == 1:
@@ -91,11 +106,11 @@ all_index = ['Número', 'N.Pré-Nota', 'Emissão', 'Fantasia-Destinatário', 'Ci
 indexes = ['Número', 'Data', 'Transportadora', 'Filial', 'Cidade/Estado', 'Ult_Status', 'Descrição']
 
 aut_index = ['Número', 'N.Pré-Nota', 'Emissão', 'Fantasia-Destinatário', 'Cidade-Destinatário', 'Uf',
-                'Natureza-Fiscal', 'Situação-Fiscal', 'Descrição-Do-Depósito', 'Fantasia_Do_Transportador',
-                'Fantasia-Comissionado']
+             'Natureza-Fiscal', 'Situação-Fiscal', 'Descrição-Do-Depósito', 'Fantasia_Do_Transportador',
+             'Fantasia-Comissionado']
 
 manual_index = ['Data-De-Coleta', 'Previsão-Entrega', 'D_Entrega', 'Agendamento', 'Lead-Time',
-         'Dias-Para-Entrega', 'Resumo', 'Enviar-Email']
+                'Dias-Para-Entrega', 'Resumo', 'Enviar-Email']
 
 dest_file = r'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/Automação de Monitoramento/MONITORAMENTO1 ' + ano_atual + '.xlsx'
 
@@ -170,7 +185,7 @@ def calc_data(dia, mes, ano, valor_a_somar):
                 mes += 1
                 valor_a_somar -= 1
             elif data == 4:
-                dia +=3
+                dia += 3
                 valor_a_somar -= 1
             else:
                 dia += 1
@@ -207,3 +222,12 @@ def func(val):
     else:
         val = '-'
     return val
+
+
+full_name_urano = "Urano " + str(date.today().strftime('%d-%m-%Y')) + ".CSV"
+
+p_source_path = "C:/Users/patrick.paula/Downloads/"
+dest_path = "K:/CWB/Logistica/Rastreamento/Patrick/Storage/" + today
+
+source_path_urano = p_source_path + full_name_urano
+dest_path_urano = dest_path + "/" + full_name_urano

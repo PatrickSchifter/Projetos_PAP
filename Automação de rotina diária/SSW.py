@@ -29,7 +29,7 @@ def search_data(mes):
     conta = 0
     for x in df['Número']:
         if conta == 20:
-            time.sleep(1 / 2)
+            time.sleep(1 / 3)
             conta = 0
         conta += 1
 

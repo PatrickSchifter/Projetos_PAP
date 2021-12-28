@@ -1,12 +1,13 @@
 import pandas as pd
 from Variaveis import index_stat, all_index, dest_file, dia_atual, ano_atual, mes_atual, dia_semana, func, file, n_file, \
-    meses_str, manual_index, aut_index
+    meses_str, manual_index, aut_index, fatiamento
 from openpyxl import load_workbook
 from openpyxl.styles import Alignment
 from openpyxl.styles import NamedStyle, Font, Border, Side, PatternFill
 from openpyxl import Workbook
 import time
 from DF_LeadTime import df_lead
+from DF_Urano import df_urano, qy_ent
 
 start_time = time.time()
 
@@ -158,8 +159,6 @@ dfs[int(mes_atual) - 1].columns = all_index
 # Convertendo D_Entrega para datatime
 dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].apply(
     lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
-dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega'].apply(
-    lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
 
 # Merge com notas agendadas
 dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=a_ssw, how='left', on='Número')
@@ -240,9 +239,36 @@ dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Col
 # Conversão para Datetime
 dfs[int(mes_atual) - 1]['Previsão-Entrega'] = dfs[int(mes_atual) - 1]['Previsão-Entrega'].apply(
     lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
+
+
+
+# Inicio do processo Urano
+
+# Merge dos DF
+dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=df_urano, how='left', on='Número')
+dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=qy_ent, how='left', on='Número')
+
+# Concatenação das colunas
+dfs[int(mes_atual) - 1]['Emissão_cte'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'] + '!' + dfs[int(mes_atual) - 1]['Emissão_cte']
+dfs[int(mes_atual) - 1]['Data_Ocorrência1'] = dfs[int(mes_atual) - 1]['D_Entrega'] + '!' + dfs[int(mes_atual) - 1]['Data_Ocorrência1']
+
+# Fatiamento
+dfs[int(mes_atual) - 1]['Emissão_cte'] = dfs[int(mes_atual) - 1]['Emissão_cte'].apply(func=lambda val: fatiamento(val))
+dfs[int(mes_atual) - 1]['Data_Ocorrência1'] = dfs[int(mes_atual) - 1]['Data_Ocorrência1'].apply(func=lambda val: fatiamento(val))
+
+
+#Alocação de coluna
+dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Emissão_cte']
+dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['Data_Ocorrência1']
+
+# Conversão para Datetime
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].apply(
     lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
+dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega'].apply(
+    lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
 
+dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].drop_duplicates(subset=['Número'])
+############################
 cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
 dates = ['C', 'L', 'M', 'N', 'O']
 

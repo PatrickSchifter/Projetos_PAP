@@ -8,7 +8,7 @@ from datetime import date
 import os
 import shutil
 import pyautogui
-import pygetwindow
+from Variaveis import source_path_urano, dest_path_urano
 
 
 def wait_by_name(element):
@@ -20,8 +20,8 @@ def wait_by_id(element):
     element = WebDriverWait(driver, 30).until(
         EC.presence_of_element_located((By.ID, element)))
 
+    # driver Chrome
 
-# driver Chrome
 
 driver = webdriver.Chrome(
     executable_path=r"K:\CWB\Logistica\Rastreamento\Patrick\Automação\chromedriver_win32\chromedriver.exe")
@@ -73,7 +73,8 @@ driver.close()
 
 path = list(os.listdir("C:/Users/patrick.paula/Downloads"))
 
-full_name_urano = "C:/Users/patrick.paula/Downloads/" + "Urano " + str(datetime.today().strftime('%d-%m-%Y')) + ".CSV"
+full_name_urano = "C:/Users/patrick.paula/Downloads/" + "Urano " + str(
+    datetime.today().strftime('%d-%m-%Y')) + ".CSV"
 
 for file in path:
     if ".CSV" in file:
@@ -151,14 +152,4 @@ except:
             file_name = "C:/Users/patrick.paula/Downloads/" + file
             os.rename(file_name, full_name_urano)
 
-    full_name_urano = "Urano " + str(datetime.today().strftime('%d-%m-%Y')) + ".CSV"
-
-    today = datetime.today().strftime("%d-%m-%Y")
-    p_source_path = "C:/Users/patrick.paula/Downloads/"
-    dest_path = "K:/CWB/Logistica/Rastreamento/Patrick/Storage/" + today
-
-    source_path_urano = p_source_path + full_name_urano
-    dest_path_urano = dest_path + "/" + full_name_urano
-
     shutil.move(source_path_urano, dest_path_urano)
-
