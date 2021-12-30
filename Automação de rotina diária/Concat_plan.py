@@ -1,6 +1,6 @@
 import pandas as pd
 from Variaveis import index_stat, all_index, dest_file, dia_atual, ano_atual, mes_atual, dia_semana, func, file, n_file, \
-    meses_str, manual_index, aut_index, fatiamento
+    meses_str, manual_index, aut_index, fatiamento, conversor_dt, separador
 from openpyxl import load_workbook
 from openpyxl.styles import Alignment
 from openpyxl.styles import NamedStyle, Font, Border, Side, PatternFill
@@ -8,6 +8,9 @@ from openpyxl import Workbook
 import time
 from DF_LeadTime import df_lead
 from DF_Urano import df_urano, qy_ent
+from SSW import name_m_ant, name_m_atual, search_data
+from DF_Veloz import df_veloz, df_veloz_m
+
 
 start_time = time.time()
 
@@ -61,14 +64,79 @@ else:
     dfs[int(mes_atual) - 1] = pd.concat([dfs[int(mes_atual) - 1], df_n],
                                         keys=all_index)
 
-from SSW import name_m_ant, name_m_atual, search_data
+#                           Processo de inclusão de informações da Veloz
 
-ssw_mes = search_data(name_m_atual)
+# Conversão para str
+dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].astype(dtype='str')
+dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].astype(dtype='str')
+# Formatação da info
 
-ssw_mes_m = search_data(name_m_ant)
+dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].apply(func=lambda val: conversor_dt(val))
+dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].apply(func=lambda val: conversor_dt(val))
+
+# Merge das Planilhas da Veloz
+
+# Merge do mês anterior
+if int(dia_atual) in range(0, 10):
+    dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=df_veloz_m, how='left', on='Número')
+
+    # Conversão para str
+    dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].astype(dtype='str')
+
+    # Concatenação das informações
+    dfs[int(mes_atual) - 2]['Data_De_Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'] + '!' + \
+                                                dfs[int(mes_atual) - 2]['Data_De_Coleta']
+
+    # Fatiamento da informação
+    dfs[int(mes_atual) - 2]['Data_De_Coleta'] = dfs[int(mes_atual) - 2]['Data_De_Coleta'].apply(
+        func=lambda val: fatiamento(val))
+
+    # Alocação dentro do DF
+    dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data_De_Coleta']
+
+# Merge do mês atual
+dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=df_veloz, how='left', on='Número')
+
+# Preenchimento de NaN
+dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
+
+# Conversão para str
+dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].astype(dtype='str')
+
+# Concatenação das informações
+dfs[int(mes_atual) - 1]['Data_De_Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'] + '!' + \
+                                            dfs[int(mes_atual) - 1]['Data_De_Coleta']
+
+# Fatiamento da informação
+print(separador)
+dfs[int(mes_atual) - 1]['Data_De_Coleta'] = dfs[int(mes_atual) - 1]['Data_De_Coleta'].apply(
+    func=lambda val: fatiamento(val))
+
+# Alocação dentro do DF
+dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data_De_Coleta']
+
+
+#                           Processo de inclusão de informações de Lead Time
+# Merge da Planilha de LeadTime
+dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=df_lead, how='left',
+                                   on=['Cidade-Destinatário', 'Uf', 'Fantasia_Do_Transportador'], copy=False)
+
+dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].drop_duplicates(subset=['Número'], keep='first')
+
+# Alocando no Lugar adequado
+dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead_Time']
+dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].apply(
+    lambda val: pd.to_numeric(val, 'coerce', 'integer'))
+
+# Preenchimento de Nan
+dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].fillna('-')
+
+#                            Processo de inclusão de informações do SSW
+# Criação dos DFs
+ssw_mes = search_data(name_m_atual)  # DF do mês
+ssw_mes_m = search_data(name_m_ant)  # DF do mês -1
 e_ssw = ssw_mes.query("Ult_Status == ' MERCADORIA ENTREGUE (01)'")  # DF com apenas as notas entregues
 e_ssw1 = ssw_mes_m.query("Ult_Status == ' MERCADORIA ENTREGUE (01)'")  # DF com apenas as notas entregues
-
 a_ssw = ssw_mes.query("Ult_Status == ' ENTREGA AGENDADA (15)'")  # DF com apenas as notas entregues
 a_ssw1 = ssw_mes_m.query("Ult_Status == ' ENTREGA AGENDADA (15)'")  # DF com apenas as notas entregues
 
@@ -77,7 +145,6 @@ a_ssw['Descrição'] = a_ssw['Descrição'].apply(func=lambda val: val[19:26] if
 a_ssw1['Descrição'] = a_ssw1['Descrição'].apply(func=lambda val: val[19:26] if len(val) > 5 else '')
 
 # Conversão de datetime para string
-
 e_ssw['Data'] = e_ssw['Data'].astype(dtype='str', copy=True)
 e_ssw1['Data'] = e_ssw1['Data'].astype(dtype='str', copy=True)
 
@@ -93,10 +160,6 @@ ssw_mes['Status'] = ssw_mes['Ult_Status'] + ' - ' + ssw_mes['Cidade/Estado']
 ssw_mes_m = ssw_mes_m[['Número', 'Data', 'Cidade/Estado', 'Ult_Status']]
 ssw_mes_m['Status'] = ssw_mes_m['Ult_Status'] + ' - ' + ssw_mes_m['Cidade/Estado']
 
-""" 1º Criar um DF cruzando as NF emitidas com NF no SSW
-    2º Criar um DF com todas as NF incluindo data de recebimento
-"""
-
 # Conversão de datetime para String
 dfs[int(mes_atual) - 2]['Agendamento'] = dfs[int(mes_atual) - 2]['Agendamento'].astype(dtype='str', copy=True)
 dfs[int(mes_atual) - 1]['Agendamento'] = dfs[int(mes_atual) - 1]['Agendamento'].astype(dtype='str', copy=True)
@@ -104,12 +167,12 @@ dfs[int(mes_atual) - 1]['Agendamento'] = dfs[int(mes_atual) - 1]['Agendamento'].
 dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].astype(dtype='str', copy=True)
 dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega'].astype(dtype='str', copy=True)
 
+# Fatiamento da informação
 dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].apply(
     func=lambda val: val[8:10] + '-' + val[5:7] + '-' + val[0:4] if len(val) > 3 else val)
 dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega'].apply(
     func=lambda val: val[8:10] + '-' + val[5:7] + '-' + val[0:4] if len(val) > 3 else val)
 
-# Cruzando as datas de entrega
 # Criação de uma coluna com as datas de entrega e NAN
 dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=e_ssw1, how='left', on='Número')
 dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=e_ssw, how='left', on='Número')
@@ -156,10 +219,6 @@ dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1][index_stat]
 dfs[int(mes_atual) - 2].columns = all_index
 dfs[int(mes_atual) - 1].columns = all_index
 
-# Convertendo D_Entrega para datatime
-dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].apply(
-    lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
-
 # Merge com notas agendadas
 dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=a_ssw, how='left', on='Número')
 dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=a_ssw1, how='left', on='Número')
@@ -190,8 +249,10 @@ dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Descrição'].
 dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Descrição'].astype(dtype='str', copy=True)
 dfs[int(mes_atual) - 1]['Descrição'] = dfs[int(mes_atual) - 1]['Descrição'].astype(dtype='str', copy=True)
 
-# Fatiamento da informação e padronizando para aceite de datetime
+for x in dfs[int(mes_atual) - 1]['Descrição']:
+    print(x)
 
+# Fatiamento da informação e padronizando para aceite de datetime
 dfs[int(mes_atual) - 1]['Descrição'] = dfs[int(mes_atual) - 1]['Descrição'].apply(
     func=lambda val: val[-6:-4] + '-' + val[-4:-2] + '-' + '20' + val[-2:] if len(val) > 1 else '-')
 dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Descrição'].apply(
@@ -207,22 +268,16 @@ dfs[int(mes_atual) - 2]['Agendamento'] = dfs[int(mes_atual) - 2]['Agendamento'].
 dfs[int(mes_atual) - 1]['Agendamento'] = dfs[int(mes_atual) - 1]['Agendamento'].apply(
     lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
 
-# Merge da Planilha de LeadTime
-dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=df_lead, how='left',
-                                   on=['Cidade-Destinatário', 'Uf', 'Fantasia_Do_Transportador'])
-
-# Alocando no Lugar adequado
-dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead_Time']
-dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].apply(
-    lambda val: pd.to_numeric(val, 'coerce', 'integer'))
-
 # Preenchendo NaN
-dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].fillna('-')
+dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].fillna('-')
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].fillna('-')
 
 # Conversão para STR
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].astype(dtype='str')
+dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].astype(dtype='str')
 dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].astype(dtype='str')
+dfs[int(mes_atual) - 2]['Lead-Time'] = dfs[int(mes_atual) - 2]['Lead-Time'].astype(dtype='str')
+
 
 # Criação de uma coluna com concatenação da DataColeta com LeadTime
 dfs[int(mes_atual) - 1]['N_Previsão'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'] + '!' + dfs[int(mes_atual) - 1][
@@ -232,42 +287,64 @@ dfs[int(mes_atual) - 1]['N_Previsão'] = dfs[int(mes_atual) - 1]['N_Previsão'].
 # Alocando no lugar adequado
 dfs[int(mes_atual) - 1]['Previsão-Entrega'] = dfs[int(mes_atual) - 1]['N_Previsão']
 
-# Fatiamento de informação
-dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].apply(
-    func=lambda val: val[8:10] + '-' + val[5:7] + '-' + val[0:4] if len(val) > 3 else val)
 
 # Conversão para Datetime
 dfs[int(mes_atual) - 1]['Previsão-Entrega'] = dfs[int(mes_atual) - 1]['Previsão-Entrega'].apply(
     lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
 
-
-
 # Inicio do processo Urano
 
 # Merge dos DF
-dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=df_urano, how='left', on='Número')
+dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=df_urano, how='left', on='Número', copy=False)
+dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=df_urano, how='left', on='Número', copy=False)
 dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=qy_ent, how='left', on='Número')
-
+dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=qy_ent, how='left', on='Número')
+dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].drop_duplicates(subset=['Número'], keep='first')
+dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2].drop_duplicates(subset=['Número'], keep='first')
+dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
+dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2].fillna('-')
 # Concatenação das colunas
-dfs[int(mes_atual) - 1]['Emissão_cte'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'] + '!' + dfs[int(mes_atual) - 1]['Emissão_cte']
-dfs[int(mes_atual) - 1]['Data_Ocorrência1'] = dfs[int(mes_atual) - 1]['D_Entrega'] + '!' + dfs[int(mes_atual) - 1]['Data_Ocorrência1']
+dfs[int(mes_atual) - 1]['Emissão_cte'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'] + '!' + dfs[int(mes_atual) - 1][
+    'Emissão_cte']
+dfs[int(mes_atual) - 2]['Emissão_cte'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'] + '!' + dfs[int(mes_atual) - 2][
+    'Emissão_cte']
+dfs[int(mes_atual) - 1]['Data_Ocorrência1'] = dfs[int(mes_atual) - 1]['D_Entrega'] + '!' + dfs[int(mes_atual) - 1][
+    'Data_Ocorrência1']
+dfs[int(mes_atual) - 2]['Data_Ocorrência1'] = dfs[int(mes_atual) - 2]['D_Entrega'] + '!' + dfs[int(mes_atual) - 2][
+    'Data_Ocorrência1']
+
 
 # Fatiamento
 dfs[int(mes_atual) - 1]['Emissão_cte'] = dfs[int(mes_atual) - 1]['Emissão_cte'].apply(func=lambda val: fatiamento(val))
-dfs[int(mes_atual) - 1]['Data_Ocorrência1'] = dfs[int(mes_atual) - 1]['Data_Ocorrência1'].apply(func=lambda val: fatiamento(val))
+dfs[int(mes_atual) - 1]['Data_Ocorrência1'] = dfs[int(mes_atual) - 1]['Data_Ocorrência1'].apply(
+    func=lambda val: fatiamento(val))
+dfs[int(mes_atual) - 2]['Emissão_cte'] = dfs[int(mes_atual) - 2]['Emissão_cte'].apply(func=lambda val: fatiamento(val))
+dfs[int(mes_atual) - 2]['Data_Ocorrência1'] = dfs[int(mes_atual) - 2]['Data_Ocorrência1'].apply(
+    func=lambda val: fatiamento(val))
 
+# Preenchimento de NaN
+dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
+dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2].fillna('-')
 
-#Alocação de coluna
+# Alocação de coluna
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Emissão_cte']
 dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['Data_Ocorrência1']
+dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Emissão_cte']
+dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['Data_Ocorrência1']
+
 
 # Conversão para Datetime
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].apply(
     lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
 dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega'].apply(
     lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
+dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].apply(
+    lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
+dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].apply(
+    lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
 
-dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].drop_duplicates(subset=['Número'])
+
+
 ############################
 cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
 dates = ['C', 'L', 'M', 'N', 'O']

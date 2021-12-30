@@ -2,6 +2,7 @@ from datetime import datetime
 import datetime
 from datetime import date
 
+separador = "#" * 500
 dia_hoje = int(datetime.date.today().strftime("%d"))
 dia_semana = datetime.date.weekday(datetime.date.today())
 ano_tual = int(datetime.date.today().strftime("%Y"))
@@ -9,18 +10,26 @@ ano_tual = int(datetime.date.today().strftime("%Y"))
 
 def fatiamento(val):
     valor = '-'
+
     try:
         qtd = len(val)
         loc_sep = val.index('!')
         if qtd > 3:
+
             if loc_sep == 10:
                 valor = val[:10]
+                valor = valor.replace('/', '-')
+
             elif loc_sep == 1:
                 valor = val[2:]
+                valor = valor.replace('/', '-')
     except TypeError:
+        print(f'Deu erro nesse valor {val} na hora do fatiamento verificar def fatiamento.')
         valor = '-'
     return valor
 
+
+# Patrick, se isso der erro por conta de alguma incoerência nos dados, use split e depois compare os itens da lista.
 
 def data():
     if dia_semana == 0:
@@ -213,14 +222,28 @@ def calc_data(dia, mes, ano, valor_a_somar):
 def func(val):
     val_ignore = ['', '-']
     val = val.split('!')
-    if val[0] not in val_ignore and val[1] not in val_ignore:
-        val[1] = int(val[1][0])
-        dia = int(val[0][8:10])
-        mes = int(val[0][5:7])
-        ano = int(val[0][:4])
-        val = calc_data(dia, mes, ano, val[1])
-    else:
-        val = '-'
+    try:
+        if val[0] not in val_ignore and val[1] not in val_ignore:
+            val[1] = int(val[1][:-2])
+            dia = int(val[0][8:10])
+            mes = int(val[0][5:7])
+            ano = int(val[0][:4])
+            val = calc_data(dia, mes, ano, val[1])
+        else:
+            val = '-'
+    except ValueError:
+        if val[0] not in val_ignore and val[1] not in val_ignore:
+            try:
+                val[1] = int(val[1][0])
+            except TypeError:
+                pass
+            dia = int(val[0][:2])
+            mes = int(val[0][3:5])
+            ano = int(val[0][6:])
+            val = calc_data(dia, mes, ano, val[1])
+        else:
+            val = '-'
+
     return val
 
 
@@ -231,3 +254,12 @@ dest_path = "K:/CWB/Logistica/Rastreamento/Patrick/Storage/" + today
 
 source_path_urano = p_source_path + full_name_urano
 dest_path_urano = dest_path + "/" + full_name_urano
+
+column_veloz = ['Faturamento', 'Data', 'Expedição', 'Número', 'Pre_nota', 'Volumes', 'Transportadora', 'NF_Veloz',
+                'Status', 'Data_De_Coleta', 'Observação', 'Atual', 'Pendencia', 'Aguardando_Separação', 'Nao_coletados'
+                ]
+def conversor_dt(val):
+    valor = '-'
+    if len(val) > 1:
+        valor = val[8:10] + '/' + val[5:7] + '/' + val[:4]
+    return valor
