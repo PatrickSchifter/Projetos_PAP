@@ -1,6 +1,6 @@
 import pandas as pd
 from Variaveis import index_stat, all_index, dest_file, dia_atual, ano_atual, mes_atual, dia_semana, func, file, n_file, \
-    meses_str, manual_index, aut_index, fatiamento, conversor_dt, separador
+    meses_str, manual_index, aut_index, fatiamento, conversor_dt, separador, conversor_ldt, dias_p_entrega
 from openpyxl import load_workbook
 from openpyxl.styles import Alignment
 from openpyxl.styles import NamedStyle, Font, Border, Side, PatternFill
@@ -8,8 +8,13 @@ from openpyxl import Workbook
 import time
 from DF_LeadTime import df_lead
 from DF_Urano import df_urano, qy_ent
-from SSW import name_m_ant, name_m_atual, search_data
-from DF_Veloz import df_veloz, df_veloz_m
+from SSW import name_m_atual, search_data
+from DF_Veloz import df_veloz
+try:
+    from SSW import name_m_ant
+    from DF_Veloz import df_veloz_m
+except ImportError:
+    pass
 
 
 start_time = time.time()
@@ -71,28 +76,35 @@ dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Col
 dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].astype(dtype='str')
 # Formatação da info
 
-dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].apply(func=lambda val: conversor_dt(val))
-dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].apply(func=lambda val: conversor_dt(val))
+dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].apply(
+    func=lambda val: conversor_dt(val))
+dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].apply(
+    func=lambda val: conversor_dt(val))
 
 # Merge das Planilhas da Veloz
 
 # Merge do mês anterior
-if int(dia_atual) in range(0, 10):
-    dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=df_veloz_m, how='left', on='Número')
+if mes_atual != '1':
+    try:
+        if int(dia_atual) in range(0, 10):
+            dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=df_veloz_m, how='left', on='Número')
 
-    # Conversão para str
-    dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].astype(dtype='str')
+            # Conversão para str
+            dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].astype(dtype='str')
 
-    # Concatenação das informações
-    dfs[int(mes_atual) - 2]['Data_De_Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'] + '!' + \
-                                                dfs[int(mes_atual) - 2]['Data_De_Coleta']
+            # Concatenação das informações
+            dfs[int(mes_atual) - 2]['Data_De_Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'] + '!' + \
+                                                        dfs[int(mes_atual) - 2]['Data_De_Coleta']
 
-    # Fatiamento da informação
-    dfs[int(mes_atual) - 2]['Data_De_Coleta'] = dfs[int(mes_atual) - 2]['Data_De_Coleta'].apply(
-        func=lambda val: fatiamento(val))
+            # Fatiamento da informação
+            dfs[int(mes_atual) - 2]['Data_De_Coleta'] = dfs[int(mes_atual) - 2]['Data_De_Coleta'].apply(
+                func=lambda val: fatiamento(val))
 
-    # Alocação dentro do DF
-    dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data_De_Coleta']
+            # Alocação dentro do DF
+            dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data_De_Coleta']
+    except NameError:
+        # Exceção tratada no if
+        pass
 
 # Merge do mês atual
 dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=df_veloz, how='left', on='Número')
@@ -115,7 +127,6 @@ dfs[int(mes_atual) - 1]['Data_De_Coleta'] = dfs[int(mes_atual) - 1]['Data_De_Col
 # Alocação dentro do DF
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data_De_Coleta']
 
-
 #                           Processo de inclusão de informações de Lead Time
 # Merge da Planilha de LeadTime
 dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=df_lead, how='left',
@@ -132,216 +143,163 @@ dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].appl
 dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].fillna('-')
 
 #                            Processo de inclusão de informações do SSW
+# Processo do mês atual
 # Criação dos DFs
 ssw_mes = search_data(name_m_atual)  # DF do mês
-ssw_mes_m = search_data(name_m_ant)  # DF do mês -1
 e_ssw = ssw_mes.query("Ult_Status == ' MERCADORIA ENTREGUE (01)'")  # DF com apenas as notas entregues
-e_ssw1 = ssw_mes_m.query("Ult_Status == ' MERCADORIA ENTREGUE (01)'")  # DF com apenas as notas entregues
 a_ssw = ssw_mes.query("Ult_Status == ' ENTREGA AGENDADA (15)'")  # DF com apenas as notas entregues
-a_ssw1 = ssw_mes_m.query("Ult_Status == ' ENTREGA AGENDADA (15)'")  # DF com apenas as notas entregues
-
-# Fatiamento da informação restando apenas a data.
 a_ssw['Descrição'] = a_ssw['Descrição'].apply(func=lambda val: val[19:26] if len(val) > 5 else '')
-a_ssw1['Descrição'] = a_ssw1['Descrição'].apply(func=lambda val: val[19:26] if len(val) > 5 else '')
-
-# Conversão de datetime para string
 e_ssw['Data'] = e_ssw['Data'].astype(dtype='str', copy=True)
-e_ssw1['Data'] = e_ssw1['Data'].astype(dtype='str', copy=True)
-
-# Padronizando a informação para aceite do datetime
 e_ssw['Data'] = e_ssw['Data'].apply(
     func=lambda val: val[8:12] + '-' + val[5:7] + '-' + val[:4] if len(val) > 3 else val)
-e_ssw1['Data'] = e_ssw1['Data'].apply(
-    func=lambda val: val[8:12] + '-' + val[5:7] + '-' + val[:4] if len(val) > 3 else val)
-
-# Concatenação de Ult Status com a localização
 ssw_mes = ssw_mes[['Número', 'Data', 'Cidade/Estado', 'Ult_Status']]
 ssw_mes['Status'] = ssw_mes['Ult_Status'] + ' - ' + ssw_mes['Cidade/Estado']
-ssw_mes_m = ssw_mes_m[['Número', 'Data', 'Cidade/Estado', 'Ult_Status']]
-ssw_mes_m['Status'] = ssw_mes_m['Ult_Status'] + ' - ' + ssw_mes_m['Cidade/Estado']
-
-# Conversão de datetime para String
-dfs[int(mes_atual) - 2]['Agendamento'] = dfs[int(mes_atual) - 2]['Agendamento'].astype(dtype='str', copy=True)
 dfs[int(mes_atual) - 1]['Agendamento'] = dfs[int(mes_atual) - 1]['Agendamento'].astype(dtype='str', copy=True)
-
-dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].astype(dtype='str', copy=True)
 dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega'].astype(dtype='str', copy=True)
-
-# Fatiamento da informação
-dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].apply(
-    func=lambda val: val[8:10] + '-' + val[5:7] + '-' + val[0:4] if len(val) > 3 else val)
 dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega'].apply(
     func=lambda val: val[8:10] + '-' + val[5:7] + '-' + val[0:4] if len(val) > 3 else val)
-
-# Criação de uma coluna com as datas de entrega e NAN
-dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=e_ssw1, how='left', on='Número')
 dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=e_ssw, how='left', on='Número')
-
-# Replace dos NaN por -
-dfs[int(mes_atual) - 2].fillna('-', inplace=True)
 dfs[int(mes_atual) - 1].fillna('-', inplace=True)
-
-# Conversão de datetime para STR
-dfs[int(mes_atual) - 2]['Data'] = dfs[int(mes_atual) - 2]['Data'].astype(dtype='str', copy=True)
 dfs[int(mes_atual) - 1]['Data'] = dfs[int(mes_atual) - 1]['Data'].astype(dtype='str', copy=True)
-
-# Concatenação da coluna de data de entrega com entrega SSW
-dfs[int(mes_atual) - 2]['B_data'] = dfs[int(mes_atual) - 2]['D_Entrega'] + '!' + dfs[int(mes_atual) - 2]['Data']
 dfs[int(mes_atual) - 1]['B_data'] = dfs[int(mes_atual) - 1]['D_Entrega'] + '!' + dfs[int(mes_atual) - 1]['Data']
-
-# Fatiando a string e deixando somente a data
-dfs[int(mes_atual) - 2]['Data'] = dfs[int(mes_atual) - 2]['B_data'].apply(
-    func=lambda val: val[0:11] if len(val) > 11 else val)
 dfs[int(mes_atual) - 1]['Data'] = dfs[int(mes_atual) - 1]['B_data'].apply(
     func=lambda val: val[0:11] if len(val) > 11 else val)
-
-# Replace de ! para ''
-dfs[int(mes_atual) - 2]['Data'] = dfs[int(mes_atual) - 2]['Data'].replace(to_replace='!', value='', regex=True)
 dfs[int(mes_atual) - 1]['Data'] = dfs[int(mes_atual) - 1]['Data'].replace(to_replace='!', value='', regex=True)
-
-# Transferindo informação para outra coluna
-dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['Data']
 dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['Data']
-
-# Excluindo informação desnecessária
-dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2][all_index]
 dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1][all_index]
-
-# Colocando último Status SSW
-dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=ssw_mes_m, how='left')
 dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=ssw_mes, how='left')
-
-# Substituindo coluna Observações por coluna Status que entrou com o Merge
-dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2][index_stat]
 dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1][index_stat]
-
-# Renomeando coluna Status para Observações
-dfs[int(mes_atual) - 2].columns = all_index
 dfs[int(mes_atual) - 1].columns = all_index
-
-# Merge com notas agendadas
 dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=a_ssw, how='left', on='Número')
-dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=a_ssw1, how='left', on='Número')
-
-# Preenchimento dos NA
 dfs[int(mes_atual) - 1]['Descrição'] = dfs[int(mes_atual) - 1]['Descrição'].fillna('')
-dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Descrição'].fillna('')
-
-# Recorte de informação
 dfs[int(mes_atual) - 1]['Agendamento'] = dfs[int(mes_atual) - 1]['Agendamento'].apply(
     func=lambda val: val[8:10] + val[5:7] + val[2:4] if len(val) > 4 else '')
-dfs[int(mes_atual) - 2]['Agendamento'] = dfs[int(mes_atual) - 2]['Agendamento'].apply(
-    func=lambda val: val[0:10] if len(val) > 4 else '')
-
-# Concatenação de datas de agendamento
 dfs[int(mes_atual) - 1]['Descrição'] = dfs[int(mes_atual) - 1]['Agendamento'] + '!' + dfs[int(mes_atual) - 1][
     'Descrição']
-dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Agendamento'] + '!' + dfs[int(mes_atual) - 1][
-    'Descrição']
-
-# Replace de ! do agendamento
 dfs[int(mes_atual) - 1]['Descrição'] = dfs[int(mes_atual) - 1]['Descrição'].replace(to_replace='!', value='',
                                                                                     regex=True)
-dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Descrição'].replace(to_replace='!', value='',
-                                                                                    regex=True)
-
-# Conversão para STR
-dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Descrição'].astype(dtype='str', copy=True)
 dfs[int(mes_atual) - 1]['Descrição'] = dfs[int(mes_atual) - 1]['Descrição'].astype(dtype='str', copy=True)
-
-for x in dfs[int(mes_atual) - 1]['Descrição']:
-    print(x)
-
-# Fatiamento da informação e padronizando para aceite de datetime
 dfs[int(mes_atual) - 1]['Descrição'] = dfs[int(mes_atual) - 1]['Descrição'].apply(
     func=lambda val: val[-6:-4] + '-' + val[-4:-2] + '-' + '20' + val[-2:] if len(val) > 1 else '-')
-dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Descrição'].apply(
-    func=lambda val: val[-6:-4] + '-' + val[-4:-2] + '-' + '20' + val[-2:] if len(val) > 1 else '-')
-
-# Transferência de informação para posição adequada dentro do DF
 dfs[int(mes_atual) - 1]['Agendamento'] = dfs[int(mes_atual) - 1]['Descrição']
-dfs[int(mes_atual) - 2]['Agendamento'] = dfs[int(mes_atual) - 2]['Descrição']
-
-# Conversão de data de agendamento para Datetime
-dfs[int(mes_atual) - 2]['Agendamento'] = dfs[int(mes_atual) - 2]['Agendamento'].apply(
-    lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
 dfs[int(mes_atual) - 1]['Agendamento'] = dfs[int(mes_atual) - 1]['Agendamento'].apply(
     lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
-
-# Preenchendo NaN
-dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].fillna('-')
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].fillna('-')
-
-# Conversão para STR
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].astype(dtype='str')
-dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].astype(dtype='str')
 dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].astype(dtype='str')
-dfs[int(mes_atual) - 2]['Lead-Time'] = dfs[int(mes_atual) - 2]['Lead-Time'].astype(dtype='str')
-
-
-# Criação de uma coluna com concatenação da DataColeta com LeadTime
 dfs[int(mes_atual) - 1]['N_Previsão'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'] + '!' + dfs[int(mes_atual) - 1][
     'Lead-Time']
 dfs[int(mes_atual) - 1]['N_Previsão'] = dfs[int(mes_atual) - 1]['N_Previsão'].apply(func=lambda val: func(val))
-
-# Alocando no lugar adequado
 dfs[int(mes_atual) - 1]['Previsão-Entrega'] = dfs[int(mes_atual) - 1]['N_Previsão']
-
-
-# Conversão para Datetime
-dfs[int(mes_atual) - 1]['Previsão-Entrega'] = dfs[int(mes_atual) - 1]['Previsão-Entrega'].apply(
-    lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
-
-# Inicio do processo Urano
-
-# Merge dos DF
 dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=df_urano, how='left', on='Número', copy=False)
-dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=df_urano, how='left', on='Número', copy=False)
 dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=qy_ent, how='left', on='Número')
-dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=qy_ent, how='left', on='Número')
 dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].drop_duplicates(subset=['Número'], keep='first')
-dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2].drop_duplicates(subset=['Número'], keep='first')
 dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
-dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2].fillna('-')
-# Concatenação das colunas
 dfs[int(mes_atual) - 1]['Emissão_cte'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'] + '!' + dfs[int(mes_atual) - 1][
-    'Emissão_cte']
-dfs[int(mes_atual) - 2]['Emissão_cte'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'] + '!' + dfs[int(mes_atual) - 2][
     'Emissão_cte']
 dfs[int(mes_atual) - 1]['Data_Ocorrência1'] = dfs[int(mes_atual) - 1]['D_Entrega'] + '!' + dfs[int(mes_atual) - 1][
     'Data_Ocorrência1']
-dfs[int(mes_atual) - 2]['Data_Ocorrência1'] = dfs[int(mes_atual) - 2]['D_Entrega'] + '!' + dfs[int(mes_atual) - 2][
-    'Data_Ocorrência1']
-
-
-# Fatiamento
+dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
 dfs[int(mes_atual) - 1]['Emissão_cte'] = dfs[int(mes_atual) - 1]['Emissão_cte'].apply(func=lambda val: fatiamento(val))
 dfs[int(mes_atual) - 1]['Data_Ocorrência1'] = dfs[int(mes_atual) - 1]['Data_Ocorrência1'].apply(
     func=lambda val: fatiamento(val))
-dfs[int(mes_atual) - 2]['Emissão_cte'] = dfs[int(mes_atual) - 2]['Emissão_cte'].apply(func=lambda val: fatiamento(val))
-dfs[int(mes_atual) - 2]['Data_Ocorrência1'] = dfs[int(mes_atual) - 2]['Data_Ocorrência1'].apply(
-    func=lambda val: fatiamento(val))
-
-# Preenchimento de NaN
-dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
-dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2].fillna('-')
-
-# Alocação de coluna
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Emissão_cte']
 dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['Data_Ocorrência1']
-dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Emissão_cte']
-dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['Data_Ocorrência1']
-
-
-# Conversão para Datetime
+dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
+dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].apply(func=lambda val: conversor_ldt(val))
+dfs[int(mes_atual) - 1]['Previsão-Entrega'] = dfs[int(mes_atual) - 1]['Previsão-Entrega'].astype(dtype='str')
+dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega'].astype(dtype='str')
+dfs[int(mes_atual) - 1]['Dias-Para-Entrega'] = dfs[int(mes_atual) - 1]['Previsão-Entrega'] + '!' + \
+                                               dfs[int(mes_atual) - 1]['D_Entrega'] + '!' + dfs[int(mes_atual) - 1][
+                                                   'Lead-Time']
+dfs[int(mes_atual) - 1]['Dias-Para-Entrega'] = dfs[int(mes_atual) - 1]['Dias-Para-Entrega'].apply(
+    func=lambda val: dias_p_entrega(val))
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].apply(
     lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
 dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega'].apply(
     lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
-dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].apply(
+dfs[int(mes_atual) - 1]['Previsão-Entrega'] = dfs[int(mes_atual) - 1]['Previsão-Entrega'].apply(
     lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
-dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].apply(
-    lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
+
+
+
+
+
+if mes_atual != '1':
+    try:
+        ssw_mes_m = search_data(name_m_ant)  # DF do mês -1
+        e_ssw1 = ssw_mes_m.query("Ult_Status == ' MERCADORIA ENTREGUE (01)'")  # DF com apenas as notas entregues
+        a_ssw1 = ssw_mes_m.query("Ult_Status == ' ENTREGA AGENDADA (15)'")  # DF com apenas as notas entregues
+        a_ssw1['Descrição'] = a_ssw1['Descrição'].apply(func=lambda val: val[19:26] if len(val) > 5 else '')
+        e_ssw1['Data'] = e_ssw1['Data'].astype(dtype='str', copy=True)
+        e_ssw1['Data'] = e_ssw1['Data'].apply(
+            func=lambda val: val[8:12] + '-' + val[5:7] + '-' + val[:4] if len(val) > 3 else val)
+        ssw_mes_m = ssw_mes_m[['Número', 'Data', 'Cidade/Estado', 'Ult_Status']]
+        ssw_mes_m['Status'] = ssw_mes_m['Ult_Status'] + ' - ' + ssw_mes_m['Cidade/Estado']
+        dfs[int(mes_atual) - 2]['Agendamento'] = dfs[int(mes_atual) - 2]['Agendamento'].astype(dtype='str', copy=True)
+        dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].astype(dtype='str', copy=True)
+        dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].apply(
+            func=lambda val: val[8:10] + '-' + val[5:7] + '-' + val[0:4] if len(val) > 3 else val)
+        dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=e_ssw1, how='left', on='Número')
+        dfs[int(mes_atual) - 2].fillna('-', inplace=True)
+        dfs[int(mes_atual) - 2]['Data'] = dfs[int(mes_atual) - 2]['Data'].astype(dtype='str', copy=True)
+        dfs[int(mes_atual) - 2]['B_data'] = dfs[int(mes_atual) - 2]['D_Entrega'] + '!' + dfs[int(mes_atual) - 2]['Data']
+        dfs[int(mes_atual) - 2]['Data'] = dfs[int(mes_atual) - 2]['B_data'].apply(
+            func=lambda val: val[0:11] if len(val) > 11 else val)
+        dfs[int(mes_atual) - 2]['Data'] = dfs[int(mes_atual) - 2]['Data'].replace(to_replace='!', value='', regex=True)
+        dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['Data']
+        dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2][all_index]
+        dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=ssw_mes_m, how='left')
+        dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2][index_stat]
+        dfs[int(mes_atual) - 2].columns = all_index
+        dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=a_ssw1, how='left', on='Número')
+        dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Descrição'].fillna('')
+        dfs[int(mes_atual) - 2]['Agendamento'] = dfs[int(mes_atual) - 2]['Agendamento'].apply(
+            func=lambda val: val[0:10] if len(val) > 4 else '')
+        dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Agendamento'] + '!' + dfs[int(mes_atual) - 1][
+            'Descrição']
+        dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Descrição'].replace(to_replace='!', value='',
+                                                                                            regex=True)
+        dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Descrição'].astype(dtype='str', copy=True)
+        dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Descrição'].apply(
+            func=lambda val: val[-6:-4] + '-' + val[-4:-2] + '-' + '20' + val[-2:] if len(val) > 1 else '-')
+        dfs[int(mes_atual) - 2]['Agendamento'] = dfs[int(mes_atual) - 2]['Descrição']
+        dfs[int(mes_atual) - 2]['Agendamento'] = dfs[int(mes_atual) - 2]['Agendamento'].apply(
+            lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
+        dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].fillna('-')
+        dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].astype(dtype='str')
+        dfs[int(mes_atual) - 2]['Lead-Time'] = dfs[int(mes_atual) - 2]['Lead-Time'].astype(dtype='str')
+        dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=df_urano, how='left', on='Número', copy=False)
+        dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=qy_ent, how='left', on='Número')
+        dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2].drop_duplicates(subset=['Número'], keep='first')
+        dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2].fillna('-')
+        dfs[int(mes_atual) - 2]['Emissão_cte'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'] + '!' + dfs[int(mes_atual) - 2][
+            'Emissão_cte']
+        dfs[int(mes_atual) - 2]['Data_Ocorrência1'] = dfs[int(mes_atual) - 2]['D_Entrega'] + '!' + dfs[int(mes_atual) - 2][
+            'Data_Ocorrência1']
+        dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2].fillna('-')
+        dfs[int(mes_atual) - 2]['Emissão_cte'] = dfs[int(mes_atual) - 2]['Emissão_cte'].apply(func=lambda val: fatiamento(val))
+        dfs[int(mes_atual) - 2]['Data_Ocorrência1'] = dfs[int(mes_atual) - 2]['Data_Ocorrência1'].apply(
+            func=lambda val: fatiamento(val))
+        dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Emissão_cte']
+        dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['Data_Ocorrência1']
+        dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2].fillna('-')
+        dfs[int(mes_atual) - 2]['Lead-Time'] = dfs[int(mes_atual) - 2]['Lead-Time'].apply(func=lambda val: conversor_ldt(val))
+        dfs[int(mes_atual) - 2]['Previsão-Entrega'] = dfs[int(mes_atual) - 2]['Previsão-Entrega'].astype(dtype='str')
+        dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].astype(dtype='str')
+        dfs[int(mes_atual) - 2]['Dias-Para-Entrega'] = dfs[int(mes_atual) - 2]['Previsão-Entrega'] + '!' + \
+                                                       dfs[int(mes_atual) - 2]['D_Entrega'] + '!' + dfs[int(mes_atual) - 2][
+                                                           'Lead-Time']
+        dfs[int(mes_atual) - 2]['Dias-Para-Entrega'] = dfs[int(mes_atual) - 2]['Dias-Para-Entrega'].apply(
+            func=lambda val: dias_p_entrega(val))
+        dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].apply(
+            lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
+        dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].apply(
+            lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
+    except NameError:
+        # Exceção já tratada no IF
+        pass
+
 
 
 

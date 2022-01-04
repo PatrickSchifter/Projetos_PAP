@@ -2,15 +2,20 @@ import pygetwindow
 import pyautogui
 import os
 import time
-from pythonProject1.Arquivo.Data_anterior import data
-from Variaveis import path_dir_tod
+from Variaveis import path_dir_tod, dataf, path_r, ano_atual, partial_path
 
 # Criação de diretório na rede
-
 try:
     os.mkdir(path_dir_tod)
-except:
+    print('Criado diretório na rede')
+except FileNotFoundError:
+        os.mkdir(path_r + ano_atual)
+        os.mkdir(partial_path)
+        os.mkdir(path_dir_tod)
+        print('Criado diretório na rede')
+except FileExistsError:
     pass
+# print('Deu algum erro ao criar o diretório')
 
 # Abertura do Everest
 
@@ -56,13 +61,13 @@ time.sleep(1)
 
 pyautogui.doubleClick(398, 239)
 
-pyautogui.write(data())
+pyautogui.write(dataf())
 
 time.sleep(1)
 
 pyautogui.doubleClick(502, 239)
 
-pyautogui.write(data())
+pyautogui.write(dataf())
 
 time.sleep(1)
 
@@ -77,6 +82,7 @@ time.sleep(2)
 import Download_Qlik
 import Download_Plan_Urano
 import N_Coleta_Veloz
+
 ######################################################################################
 
 # Localiza a janela do Everest na barra de tarefas e maximiza.
@@ -91,6 +97,5 @@ window.maximize()
 window.resizeTo(1366, 768)
 
 import Baixar_Notas_Emitidas
+import Concat_plan
 
-# import SSW
-# import Trat_dados_ssw

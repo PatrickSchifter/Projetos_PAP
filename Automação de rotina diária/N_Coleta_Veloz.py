@@ -4,6 +4,7 @@ from selenium import webdriver
 import pyautogui
 import os
 from datetime import datetime
+from Variaveis import dest_path
 
 path_driver = "K:\CWB\Logistica\Rastreamento\Patrick\Automação\chromedriver_win32\chromedriver.exe"
 
@@ -13,9 +14,6 @@ link_gdrive = 'https://drive.google.com/drive/folders/1_wfu6sA9Jplfa2uaytx8dXPqI
 
 try:
     driver.get(link_gdrive)
-
-    today = datetime.today().strftime("%d-%m-%Y")
-    dest_path = "K:/CWB/Logistica/Rastreamento/Patrick/Storage/" + today
     path_file = 'C:/Users/patrick.paula/Downloads/CONTROLE DE PEDIDOS PAP 2021.xlsx'
 
     time.sleep(3)
@@ -47,7 +45,7 @@ except:
 
     today = datetime.today().strftime("%d-%m-%Y")
     dest_path = "K:/CWB/Logistica/Rastreamento/Patrick/Storage/" + today
-    path_file = 'C:/Users/patrick.paula/Downloads/CONTROLE DE PEDIDOS PAP 2021.xlsx'
+    path_file = 'C:/Users/patrick.paula/Downloads/'
 
     time.sleep(3)
     pyautogui.click(332, 332)

@@ -1,22 +1,26 @@
 import requests
 import pandas as pd
-from Variaveis import itens_ign, all_index, indexes, meses, mes_atual, ano_atual
+from Variaveis import itens_ign, all_index, indexes, meses_str, mes_atual, ano_atual
 import time
-
-notas = [420063, 420058, 420301, 420781, 420792, 420794, 420900, 421332, 421334, 421335, 421341, 421342, 421417, 417461,
-         418399, 418401, 418577, 418578, 418580, 418872, 419049, 419054, 419360]
-
 start_time = time.time()
 
 url = 'https://ssw.inf.br/api/tracking'
 cnpj = '00069957000194'
-path = r'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/MONITORAMENTO 2021 v.1.2.xlsx'
-name_m_atual = meses[str(int(mes_atual))].upper() + '-' + str(ano_atual)
-name_m_ant = meses[str(int(mes_atual) - 1)].upper() + '-' + str(ano_atual)
+file_m_atual = r'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/MONITORAMENTO ' + ano_atual + '.xlsx'
+file_m_ant = r'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/MONITORAMENTO' + str(int(ano_atual) - 1) + 'xlsx'
+name_m_atual = meses_str[str(int(mes_atual))].upper() + '-' + str(ano_atual)
+if mes_atual == '1':
+    name_m_ant = meses_str['12'].upper() + '-' + str(int(ano_atual) - 1)
+else:
+    try:
+        name_m_ant = meses_str[str(int(mes_atual) - 1)].upper() + '-' + str(ano_atual)
+    except KeyError:
+        # Já foi tratada a exceção no if
+        pass
 
 
 def search_data(mes):
-    df = pd.read_excel(path, mes)
+    df = pd.read_excel(file_m_atual, mes)
     df.columns = all_index
     df.fillna('-')
     df = df.query(

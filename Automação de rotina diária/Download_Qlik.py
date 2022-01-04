@@ -8,7 +8,7 @@ import os
 from datetime import datetime
 import shutil
 import pygetwindow
-from Variaveis import meses
+from Variaveis import meses, dest_path
 
 ac_day = datetime.today().strftime("%d")
 ac_mon = datetime.today().strftime("%m")
@@ -121,12 +121,8 @@ de = " de "
 full_name_qlik = partial_name_1 + ac_day + de + meses[ac_mon] + de + ac_yea + partial_name_2
 today = datetime.today().strftime("%d-%m-%Y")
 p_source_path = "C:/Users/patrick.paula/Downloads/"
-dest_path = "K:/CWB/Logistica/Rastreamento/Patrick/Storage/" + today
 
-try:
-    source_path_qlik = p_source_path + full_name_qlik
-    dest_path_qlik = dest_path + "/" + full_name_qlik
+source_path_qlik = p_source_path + full_name_qlik
+dest_path_qlik = dest_path + "/" + full_name_qlik
 
-    shutil.move(source_path_qlik, dest_path_qlik)
-except:
-    pass
+shutil.move(source_path_qlik, dest_path_qlik)

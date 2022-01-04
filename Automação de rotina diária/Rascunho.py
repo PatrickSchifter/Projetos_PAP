@@ -1,4 +1,4 @@
-str = '41211226253785000106550010000056161818216122'
+str = [1, 2, 3, 4, 5]
 
-
-print(int(len(str)))
+for x in range(0,len(str)):
+    print(x)

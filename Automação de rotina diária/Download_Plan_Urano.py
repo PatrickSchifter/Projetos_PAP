@@ -8,7 +8,7 @@ from datetime import date
 import os
 import shutil
 import pyautogui
-from Variaveis import source_path_urano, dest_path_urano
+from Variaveis import source_path_urano, dest_path_urano, full_name_urano, dest_path
 
 
 def wait_by_name(element):
@@ -73,27 +73,22 @@ driver.close()
 
 path = list(os.listdir("C:/Users/patrick.paula/Downloads"))
 
-full_name_urano = "C:/Users/patrick.paula/Downloads/" + "Urano " + str(
-    datetime.today().strftime('%d-%m-%Y')) + ".CSV"
-
 for file in path:
+    print(file)
     if ".CSV" in file:
         file_name = "C:/Users/patrick.paula/Downloads/" + file
-        os.rename(file_name, full_name_urano)
-
-full_name_urano = "Urano " + str(datetime.today().strftime('%d-%m-%Y')) + ".CSV"
-
-today = datetime.today().strftime("%d-%m-%Y")
-p_source_path = "C:/Users/patrick.paula/Downloads/"
-dest_path = "K:/CWB/Logistica/Rastreamento/Patrick/Storage/" + today
-
+        try:
+            shutil.move(file_name, dest_path + '/' + file)
+            print('Arquivo da Urano encontrado e renomeado')
+            os.rename(dest_path + '/' + file, dest_path + '/' + full_name_urano)
+        except:
+            print('deu erro')
+            pass
+time.sleep(3)
 try:
-
-    source_path_urano = p_source_path + full_name_urano
-    dest_path_urano = dest_path + "/" + full_name_urano
-
-    shutil.move(source_path_urano, dest_path_urano)
-except:
+    pass
+except FileNotFoundError:
+    print('Deu erro ao encontrar o arquivo e o processo reiniciará')
     driver = webdriver.Chrome(
         executable_path=r"K:\CWB\Logistica\Rastreamento\Patrick\Automação\chromedriver_win32\chromedriver.exe")
 
@@ -144,12 +139,13 @@ except:
 
     path = list(os.listdir("C:/Users/patrick.paula/Downloads"))
 
-    full_name_urano = "C:/Users/patrick.paula/Downloads/" + "Urano " + str(
-        datetime.today().strftime('%d-%m-%Y')) + ".CSV"
-
     for file in path:
         if ".CSV" in file:
             file_name = "C:/Users/patrick.paula/Downloads/" + file
-            os.rename(file_name, full_name_urano)
-
-    shutil.move(source_path_urano, dest_path_urano)
+            try:
+                shutil.move(file_name, dest_path + '/' + file)
+                print('Arquivo da Urano encontrado e movido')
+                os.rename(dest_path + '/' + file, dest_path + '/' + full_name_urano)
+            except:
+                print('deu erro')
+                pass

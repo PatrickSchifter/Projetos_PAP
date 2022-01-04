@@ -37,6 +37,7 @@ df_cli = pd.read_excel(cli_path)
 df_rep = pd.read_excel(df_rep)
 
 wait_time = 20
+print(df_min)
 
 try:
     df_min.columns = ['Número', 'Data']
@@ -64,17 +65,16 @@ print(frame['Fantasia_Comissionado'])
 meu_num = '+5541991912238'
 
 for row in frame.itertuples(index=True, name='Row'):
-    if row.Fantasia_Comissionado in lista_envios:
-        tel_cli = '+' + str(row.Cel_Cliente)
-        msg_cli = 'Prezado cliente, informamos que seu pedido com a Porto a Porto NF {} já saiu para entrega e em breve estará chegando em seu estabelecimento! \n\n\nObs: Essa é uma mensagem automática, por gentileza não responder.'.format(
-            row.Número)
-        pywhatkit.sendwhatmsg_instantly(phone_no=tel_cli,
-                                        message=msg_cli, wait_time=wait_time,
-                                        tab_close=True, close_time=2)
+    tel_cli = '+' + str(row.Cel_Cliente)
+    msg_cli = 'Prezado cliente, informamos que seu pedido com a Porto a Porto NF {} já saiu para entrega e em breve estará chegando em seu estabelecimento! \n\n\nObs: Essa é uma mensagem automática, por gentileza não responder.'.format(
+        row.Número)
+    pywhatkit.sendwhatmsg_instantly(phone_no=tel_cli,
+                                    message=msg_cli, wait_time=wait_time,
+                                    tab_close=True, close_time=2)
 
 msg_vz = 'Prezado representante, informamos que as seguintes notas estão em rota de entrega: \n \nEssa é uma mensagem automática, por gentileza não responder.'
 
-for rep in lista_envios:
+for rep in df_rep['Fantasia Comissionado']:
     n_frame = frame.query(f"Fantasia_Comissionado == '{str(rep)}'")
     msg = 'Prezado representante, informamos que as seguintes notas estão em rota de entrega: \n \n'
 
@@ -84,6 +84,7 @@ for rep in lista_envios:
     msg += 'Essa é uma mensagem automática, por gentileza não responder.'
 
     if msg != msg_vz:
+        print(row.Celular_Comissionado)
         tel_com = '+' + str(row.Celular_Comissionado)
         pywhatkit.sendwhatmsg_instantly(phone_no=tel_com, wait_time=wait_time,
                                         message=msg,

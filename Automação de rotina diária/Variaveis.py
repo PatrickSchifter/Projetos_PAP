@@ -2,10 +2,42 @@ from datetime import datetime
 import datetime
 from datetime import date
 
+dir_coletas = r'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/Automação de Monitoramento/Coletados/'
+dir_arq_coletas = r'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/Automação de Monitoramento/Coletados/Arquivo/'
 separador = "#" * 500
 dia_hoje = int(datetime.date.today().strftime("%d"))
 dia_semana = datetime.date.weekday(datetime.date.today())
 ano_tual = int(datetime.date.today().strftime("%Y"))
+dia_atual = date.today().strftime('%d')
+ano_atual = date.today().strftime('%Y')
+mes_atual = date.today().strftime('%m')
+today = date.today().strftime("%d-%m-%Y")
+dias_meses = {
+    1: 31,
+    2: 28,
+    3: 31,
+    4: 30,
+    5: 31,
+    6: 30,
+    7: 31,
+    8: 31,
+    9: 30,
+    10: 31,
+    11: 30,
+    12: 31
+}
+meses = {"01": "janeiro",
+         "02": "fevereiro",
+         "03": "março",
+         "04": "abril",
+         "05": "maio",
+         "06": "junho",
+         "07": "julho",
+         "08": "agosto",
+         "09": "setembro",
+         "10": "outubro",
+         "11": "novembro",
+         "12": "dezembro"}
 
 
 def fatiamento(val):
@@ -32,63 +64,113 @@ def fatiamento(val):
 # Patrick, se isso der erro por conta de alguma incoerência nos dados, use split e depois compare os itens da lista.
 
 def data():
-    if dia_semana == 0:
-        if dia_hoje == 1:
-            dia = dias_meses[int(mes_atual) - 1] - 2
-            return datetime.date(ano_tual, int(mes_atual) - 1, dia).strftime("%d/%m/%Y")
+    if mes_atual != '01':
+        if dia_semana == 0:
+            if dia_hoje == 1:
+                dia = dias_meses[int(mes_atual) - 1] - 2
+                return datetime.date(ano_tual, int(mes_atual) - 1, dia).strftime("%d/%m/%Y")
 
-        elif dia_hoje == 2:
-            dia = dias_meses[int(mes_atual) - 1] - 1
-            return datetime.date(ano_tual, int(mes_atual) - 1, dia).strftime("%d/%m/%Y")
+            elif dia_hoje == 2:
+                dia = dias_meses[int(mes_atual) - 1] - 1
+                return datetime.date(ano_tual, int(mes_atual) - 1, dia).strftime("%d/%m/%Y")
 
-        elif dia_hoje == 3:
-            dia = dias_meses[mes_atual]
-            return datetime.date(ano_tual, int(mes_atual) - 1, dia).strftime("%d/%m/%Y")
+            elif dia_hoje == 3:
+                dia = dias_meses[mes_atual]
+                return datetime.date(ano_tual, int(mes_atual) - 1, dia).strftime("%d/%m/%Y")
+
+            else:
+                dia = dia_hoje - 3
+                return datetime.date(ano_tual, int(mes_atual), dia).strftime("%d/%m/%Y")
 
         else:
-            dia = dia_hoje - 3
-            return datetime.date(ano_tual, int(mes_atual), dia).strftime("%d/%m/%Y")
-
+            if dia_hoje == 1:
+                dia = dias_meses[int(mes_atual) - 1]
+                return datetime.date(ano_tual, int(mes_atual) - 1, dia).strftime("%d/%m/%Y")
+            else:
+                dia = dia_hoje - 1
+                return datetime.date(ano_tual, int(mes_atual), dia).strftime("%d/%m/%Y")
     else:
-        if dia_hoje == 1:
-            dia = dias_meses[int(mes_atual) - 1]
-            return datetime.date(ano_tual, int(mes_atual) - 1, dia).strftime("%d/%m/%Y")
+        if dia_semana == 0:
+            if dia_hoje == 1:
+                dia = dias_meses[int(mes_atual) - 1] - 2
+                return datetime.date(ano_tual, int(mes_atual) - 1, dia).strftime("%d/%m/%Y")
+
+            elif dia_hoje == 2:
+                dia = dias_meses[int(mes_atual) - 1] - 1
+                return datetime.date(ano_tual, int(mes_atual) - 1, dia).strftime("%d/%m/%Y")
+
+            elif dia_hoje == 3:
+                dia = dias_meses[mes_atual]
+                return datetime.date(ano_tual, int(mes_atual) - 1, dia).strftime("%d/%m/%Y")
+
+            else:
+                dia = dia_hoje - 3
+                return datetime.date(ano_tual, int(mes_atual), dia).strftime("%d/%m/%Y")
+
         else:
-            dia = dia_hoje - 1
-            return datetime.date(ano_tual, int(mes_atual), dia).strftime("%d/%m/%Y")
+            if dia_hoje == 1:
+                dia = dias_meses[int(mes_atual) - 1]
+                return datetime.date(ano_tual, int(mes_atual) - 1, dia).strftime("%d/%m/%Y")
+            else:
+                dia = dia_hoje - 1
+                return datetime.date(ano_tual, int(mes_atual), dia).strftime("%d/%m/%Y")
 
 
 def dataf():
-    if dia_semana == 0:
-        if dia_hoje == 1:
-            dia = dias_meses[int(mes_atual) - 1] - 2
-            return datetime.date(ano_tual, int(mes_atual) - 1, dia).strftime("%d-%m-%Y")
+    if mes_atual != '01':
+        if dia_semana == 0:
+            if dia_hoje == 1:
+                dia = dias_meses[int(mes_atual) - 1] - 2
+                return datetime.date(ano_tual, int(mes_atual) - 1, dia).strftime("%d-%m-%Y")
 
-        elif dia_hoje == 2:
-            dia = dias_meses[int(mes_atual) - 1] - 1
-            return datetime.date(ano_tual, int(mes_atual) - 1, dia).strftime("%d-%m-%Y")
+            elif dia_hoje == 2:
+                dia = dias_meses[int(mes_atual) - 1] - 1
+                return datetime.date(ano_tual, int(mes_atual) - 1, dia).strftime("%d-%m-%Y")
 
-        elif dia_hoje == 3:
-            dia = dias_meses[int(mes_atual)]
-            return datetime.date(ano_tual, int(mes_atual) - 1, dia).strftime("%d-%m-%Y")
+            elif dia_hoje == 3:
+                dia = dias_meses[int(mes_atual)]
+                return datetime.date(ano_tual, int(mes_atual) - 1, dia).strftime("%d-%m-%Y")
 
+            else:
+                dia = dia_hoje - 3
+                return datetime.date(ano_tual, int(mes_atual), dia).strftime("%d-%m-%Y")
         else:
-            dia = dia_hoje - 3
-            return datetime.date(ano_tual, int(mes_atual), dia).strftime("%d-%m-%Y")
+            if dia_hoje == 1:
+                dia = dias_meses[int(mes_atual) - 1]
+                return datetime.date(ano_tual, int(mes_atual) - 1, dia).strftime("%d-%m-%Y")
+            else:
+                dia = dia_hoje - 1
+                return datetime.date(ano_tual, int(mes_atual), dia).strftime("%d-%m-%Y")
     else:
-        if dia_hoje == 1:
-            dia = dias_meses[int(mes_atual) - 1]
-            return datetime.date(ano_tual, int(mes_atual) - 1, dia).strftime("%d-%m-%Y")
+        if dia_semana == 0:
+            if dia_hoje == 1:
+                dia = dias_meses[12] - 2
+                return datetime.date(ano_tual - 1, 12, dia).strftime("%d-%m-%Y")
+
+            elif dia_hoje == 2:
+                dia = dias_meses[12] - 2
+                return datetime.date(ano_tual - 1, 12, dia).strftime("%d-%m-%Y")
+
+            elif dia_hoje == 3:
+                dia = dias_meses[12] - 2
+                return datetime.date(ano_tual - 1, 12, dia).strftime("%d-%m-%Y")
+            elif dia_hoje == 4:
+                dia = dias_meses[12] - 2
+                return datetime.date(ano_tual - 1, 12, dia).strftime("%d-%m-%Y")
+
+            else:
+                dia = dia_hoje - 3
+                return datetime.date(ano_tual - 1, 12, dia).strftime("%d-%m-%Y")
         else:
-            dia = dia_hoje - 1
-            return datetime.date(ano_tual, int(mes_atual), dia).strftime("%d-%m-%Y")
+            if dia_hoje == 1:
+                dia = dias_meses[12]
+                return datetime.date(ano_tual - 1, 12, dia).strftime("%d-%m-%Y")
+            else:
+                dia = dia_hoje - 1
+                return datetime.date(ano_tual - 1, 12, dia).strftime("%d-%m-%Y")
 
 
-dia_atual = date.today().strftime('%d')
-ano_atual = date.today().strftime('%Y')
-mes_atual = date.today().strftime('%m')
-today = date.today().strftime("%d-%m-%Y")
-dest_path = "K:/CWB/Logistica/Rastreamento/Patrick/Storage/" + today
+dest_path = r'K:/CWB/Logistica/Rastreamento/Patrick/Storage/' + ano_atual + '/' + meses[mes_atual].title() + '/' + today
 dia_ontem = int(date.today().strftime('%d')) - 1
 ano_atual_i = int(date.today().strftime('%Y'))
 yest = date(ano_atual_i, int(mes_atual), dia_ontem).strftime("%d-%m-%Y")
@@ -98,9 +180,9 @@ index_stat = ['Número', 'N.Pré-Nota', 'Emissão', 'Fantasia-Destinatário', 'C
               'Fantasia-Comissionado', 'Data-De-Coleta', 'Previsão-Entrega', 'D_Entrega', 'Agendamento',
               'Lead-Time',
               'Dias-Para-Entrega', 'Resumo', 'Status']
-
-partial_path = "K:/CWB/Logistica/Rastreamento/Patrick/Storage/"
-file = r'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/MONITORAMENTO 2021 v.1.2.xlsx'
+path_r = r'K:/CWB/Logistica/Rastreamento/Patrick/Storage/'
+partial_path = r'K:/CWB/Logistica/Rastreamento/Patrick/Storage/' + ano_atual + '/' + meses[mes_atual].title() + '/'
+file = r'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/MONITORAMENTO ' + ano_atual + '.xlsx'
 n_file = partial_path + today + '/Notas_emitidas ' + dataf() + '.xlsx'  # Notas do dia anterior
 today = date.today().strftime("%d-%m-%Y")
 
@@ -135,34 +217,6 @@ meses_str = {"1": "JANEIRO",
              "10": "OUTUBRO",
              "11": "NOVEMBRO",
              "12": "DEZEMBRO"}
-
-dias_meses = {
-    1: 31,
-    2: 28,
-    3: 31,
-    4: 30,
-    5: 31,
-    6: 30,
-    7: 31,
-    8: 31,
-    9: 30,
-    10: 31,
-    11: 30,
-    12: 31
-}
-
-meses = {"01": "janeiro",
-         "02": "fevereiro",
-         "03": "março",
-         "04": "abril",
-         "05": "maio",
-         "06": "junho",
-         "07": "julho",
-         "08": "agosto",
-         "09": "setembro",
-         "10": "outubro",
-         "11": "novembro",
-         "12": "dezembro"}
 
 from datetime import date
 
@@ -247,10 +301,9 @@ def func(val):
     return val
 
 
-full_name_urano = "Urano " + str(date.today().strftime('%d-%m-%Y')) + ".CSV"
+full_name_urano = "Urano - " + str(date.today().strftime('%d-%m-%Y')) + ".CSV"
 
 p_source_path = "C:/Users/patrick.paula/Downloads/"
-dest_path = "K:/CWB/Logistica/Rastreamento/Patrick/Storage/" + today
 
 source_path_urano = p_source_path + full_name_urano
 dest_path_urano = dest_path + "/" + full_name_urano
@@ -258,8 +311,111 @@ dest_path_urano = dest_path + "/" + full_name_urano
 column_veloz = ['Faturamento', 'Data', 'Expedição', 'Número', 'Pre_nota', 'Volumes', 'Transportadora', 'NF_Veloz',
                 'Status', 'Data_De_Coleta', 'Observação', 'Atual', 'Pendencia', 'Aguardando_Separação', 'Nao_coletados'
                 ]
+
+
 def conversor_dt(val):
     valor = '-'
     if len(val) > 1:
         valor = val[8:10] + '/' + val[5:7] + '/' + val[:4]
+    return valor
+
+
+def conversor_ldt(val):
+    valor = '-'
+    if val == '-':
+        valor = '-'
+    else:
+        try:
+            valor = val[:-2]
+        except ValueError:
+            if val.isnumeric():
+                valor = str(val)
+            else:
+                valor = '-'
+
+    return valor
+
+
+def calc_dias_p_entrega(dia_prev, mes_prev, ano_prev):
+    print(dia_prev, mes_prev, ano_prev)
+    if dia_prev < int(dia_atual) and mes_prev <= int(mes_atual) and ano_prev <= int(ano_atual):
+        uteis = [0, 1, 2, 3, 4]
+        cont = 0
+        t_loop = True
+        while t_loop:
+            try:
+                data = date.weekday(datetime.date(ano_prev, mes_prev, dia_prev))
+            except:
+                pass
+            if dia_prev > 0:
+                if data in uteis:
+                    dia_prev += 1
+                    cont -= 1
+                else:
+                    dia_prev += 1
+            elif dia_prev == 0 and mes_prev != 12:
+                mes_prev = mes_prev + 1
+                dia_prev = dias_meses[mes_prev + 1]
+                cont -= 1
+            else:
+                mes_prev = 1
+                dia_prev = dias_meses[mes_prev]
+                ano_prev = ano_prev + 1
+                cont -= 1
+            if dia_prev == dia_atual:
+                if mes_prev == mes_atual:
+                    if ano_prev == ano_atual:
+                        t_loop = False
+                        return cont
+    else:
+        uteis = [0, 1, 2, 3, 4]
+        cont = 0
+        t_loop = True
+        while t_loop:
+            try:
+                data = date.weekday(datetime.date(ano_prev, mes_prev, dia_prev))
+            except:
+                pass
+            if dia_prev > 0:
+                if data in uteis:
+                    dia_prev -= 1
+                    cont += 1
+                else:
+                    dia_prev -= 1
+            elif dia_prev == 0 and mes_prev != 1:
+                mes_prev = mes_prev - 1
+                dia_prev = dias_meses[mes_prev - 1]
+                cont += 1
+            else:
+                mes_prev = 12
+                dia_prev = dias_meses[mes_prev]
+                ano_prev = ano_prev - 1
+                cont += 1
+            if dia_prev == int(dia_atual):
+                if mes_prev == int(mes_atual):
+                    if ano_prev == int(ano_atual):
+                        t_loop = False
+        return cont
+
+
+def dias_p_entrega(val):
+    valor = ''
+    l_conc = val.split('!')
+    l_prev = l_conc[0]
+    l_prev = l_prev.split('-')
+    print(val)
+
+    if l_conc[1] != '-':
+        valor = "Entregue"
+    elif l_conc[0] == '-' or l_conc[2] == '-':
+        valor = '-'
+    else:
+        try:
+            dia_prev = int(l_prev[0])
+            mes_prev = int(l_prev[1])
+            ano_prev = int(l_prev[2])
+            valor = calc_dias_p_entrega(dia_prev, mes_prev, ano_prev)
+        except:
+            valor = '-'
+
     return valor
