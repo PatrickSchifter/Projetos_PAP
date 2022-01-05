@@ -99,3 +99,24 @@ window.resizeTo(1366, 768)
 import Baixar_Notas_Emitidas
 import Concat_plan
 
+for x in list(pygetwindow.getAllTitles()):
+    if "EVEREST" in x:
+        title = x
+
+window = pygetwindow.getWindowsWithTitle(title)[0]
+window.activate()
+window.maximize()
+window.resizeTo(1366, 768)
+
+pyautogui.click(1234, 106)
+time.sleep(1)
+pyautogui.click(1240, 48)
+time.sleep(1)
+pyautogui.click(1256, 177)
+time.sleep(1)
+pyautogui.click(1240, 48)
+time.sleep(1)
+pyautogui.click(1267, 199)
+time.sleep(1)
+
+

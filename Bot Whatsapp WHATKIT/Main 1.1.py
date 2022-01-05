@@ -42,7 +42,7 @@ print(df_min)
 try:
     df_min.columns = ['Número', 'Data']
 except:
-    df_min.columns = ['Número', 'Data', 'Transportador']
+    df_min.columns = ['Número', 'Volumes', 'Transportador', 'Data']
 
 df_min = df_min['Número']
 frame = pd.merge(left=df_min, right=df_not, how='left', on='Número')

@@ -1,4 +1,5 @@
-str = [1, 2, 3, 4, 5]
+import pyautogui
+import time
 
-for x in range(0,len(str)):
-    print(x)
+time.sleep(5)
+print(pyautogui.position())

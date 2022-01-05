@@ -2,6 +2,8 @@ from datetime import datetime
 import datetime
 from datetime import date
 
+import pandas as pd
+
 dir_coletas = r'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/Automação de Monitoramento/Coletados/'
 dir_arq_coletas = r'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/Automação de Monitoramento/Coletados/Arquivo/'
 separador = "#" * 500
@@ -39,10 +41,23 @@ meses = {"01": "janeiro",
          "11": "novembro",
          "12": "dezembro"}
 
+def columns_to_datetime(val):
+    val[11] = pd.to_datetime(arg=val[11], errors='coerce', format='%d-%m-%Y')
+    print(val[11])
+    val[12] = pd.to_datetime(arg=val[12], errors='coerce', format='%d-%m-%Y')
+    print(val[12])
+    val[13] = pd.to_datetime(arg=val[13], errors='coerce', format='%d-%m-%Y')
+    val[14] = pd.to_datetime(arg=val[14], errors='coerce', format='%d-%m-%Y')
+    return val[11], val[12], val[13], val[14]
+
+def to_date_time(val):
+    val = pd.to_datetime(arg=val, errors='coerce', format='%d-%m-%Y')
+    valor = val
+    return valor
+
 
 def fatiamento(val):
     valor = '-'
-
     try:
         qtd = len(val)
         loc_sep = val.index('!')
@@ -337,7 +352,6 @@ def conversor_ldt(val):
 
 
 def calc_dias_p_entrega(dia_prev, mes_prev, ano_prev):
-    print(dia_prev, mes_prev, ano_prev)
     if dia_prev < int(dia_atual) and mes_prev <= int(mes_atual) and ano_prev <= int(ano_atual):
         uteis = [0, 1, 2, 3, 4]
         cont = 0
@@ -403,7 +417,6 @@ def dias_p_entrega(val):
     l_conc = val.split('!')
     l_prev = l_conc[0]
     l_prev = l_prev.split('-')
-    print(val)
 
     if l_conc[1] != '-':
         valor = "Entregue"

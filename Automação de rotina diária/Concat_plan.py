@@ -1,6 +1,7 @@
 import pandas as pd
 from Variaveis import index_stat, all_index, dest_file, dia_atual, ano_atual, mes_atual, dia_semana, func, file, n_file, \
-    meses_str, manual_index, aut_index, fatiamento, conversor_dt, separador, conversor_ldt, dias_p_entrega
+    meses_str, manual_index, aut_index, fatiamento, conversor_dt, separador, conversor_ldt, dias_p_entrega, \
+    to_date_time, columns_to_datetime
 from openpyxl import load_workbook
 from openpyxl.styles import Alignment
 from openpyxl.styles import NamedStyle, Font, Border, Side, PatternFill
@@ -10,12 +11,13 @@ from DF_LeadTime import df_lead
 from DF_Urano import df_urano, qy_ent
 from SSW import name_m_atual, search_data
 from DF_Veloz import df_veloz
+from DF_Coletados import df_col
+
 try:
     from SSW import name_m_ant
     from DF_Veloz import df_veloz_m
 except ImportError:
     pass
-
 
 start_time = time.time()
 
@@ -69,21 +71,19 @@ else:
     dfs[int(mes_atual) - 1] = pd.concat([dfs[int(mes_atual) - 1], df_n],
                                         keys=all_index)
 
-#                           Processo de inclusão de informações da Veloz
-
-# Conversão para str
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].astype(dtype='str')
-dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].astype(dtype='str')
-# Formatação da info
 
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].apply(
     func=lambda val: conversor_dt(val))
-dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].apply(
-    func=lambda val: conversor_dt(val))
+dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
+dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=df_col, how='left', on='Número')
+dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
+dfs[int(mes_atual) - 1]['Data-De-Coleta_col'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'] + '!' + \
+                                                dfs[int(mes_atual) - 1]['Data-De-Coleta_col']
+dfs[int(mes_atual) - 1]['Data-De-Coleta_col'] = dfs[int(mes_atual) - 1]['Data-De-Coleta_col'].apply(
+    func=lambda val: fatiamento(val))
+dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta_col']
 
-# Merge das Planilhas da Veloz
-
-# Merge do mês anterior
 if mes_atual != '1':
     try:
         if int(dia_atual) in range(0, 10):
@@ -106,21 +106,12 @@ if mes_atual != '1':
         # Exceção tratada no if
         pass
 
-# Merge do mês atual
 dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=df_veloz, how='left', on='Número')
-
-# Preenchimento de NaN
 dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
-
-# Conversão para str
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].astype(dtype='str')
-
-# Concatenação das informações
 dfs[int(mes_atual) - 1]['Data_De_Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'] + '!' + \
                                             dfs[int(mes_atual) - 1]['Data_De_Coleta']
 
-# Fatiamento da informação
-print(separador)
 dfs[int(mes_atual) - 1]['Data_De_Coleta'] = dfs[int(mes_atual) - 1]['Data_De_Coleta'].apply(
     func=lambda val: fatiamento(val))
 
@@ -182,8 +173,6 @@ dfs[int(mes_atual) - 1]['Descrição'] = dfs[int(mes_atual) - 1]['Descrição'].
 dfs[int(mes_atual) - 1]['Descrição'] = dfs[int(mes_atual) - 1]['Descrição'].apply(
     func=lambda val: val[-6:-4] + '-' + val[-4:-2] + '-' + '20' + val[-2:] if len(val) > 1 else '-')
 dfs[int(mes_atual) - 1]['Agendamento'] = dfs[int(mes_atual) - 1]['Descrição']
-dfs[int(mes_atual) - 1]['Agendamento'] = dfs[int(mes_atual) - 1]['Agendamento'].apply(
-    lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].fillna('-')
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].astype(dtype='str')
 dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].astype(dtype='str')
@@ -214,19 +203,35 @@ dfs[int(mes_atual) - 1]['Dias-Para-Entrega'] = dfs[int(mes_atual) - 1]['Previsã
                                                    'Lead-Time']
 dfs[int(mes_atual) - 1]['Dias-Para-Entrega'] = dfs[int(mes_atual) - 1]['Dias-Para-Entrega'].apply(
     func=lambda val: dias_p_entrega(val))
+
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].apply(
-    lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
+    lambda val: to_date_time(val))
 dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega'].apply(
-    lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
+    lambda val: to_date_time(val))
 dfs[int(mes_atual) - 1]['Previsão-Entrega'] = dfs[int(mes_atual) - 1]['Previsão-Entrega'].apply(
+    lambda val: to_date_time(val))
+dfs[int(mes_atual) - 1]['Agendamento'] = dfs[int(mes_atual) - 1]['Agendamento'].apply(
     lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
-
-
-
-
+dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].apply(
+    func=lambda val: pd.to_numeric(arg=val, errors='coerce'))
+dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].fillna('-')
 
 if mes_atual != '1':
     try:
+
+        dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].astype(dtype='str')
+
+        # por algum motivo aqui buga e converte a dfs[int(mes_atual) - 1]['Data-De-Coleta'] para str
+        dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].apply(
+            func=lambda val: conversor_dt(val))
+        dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2].fillna('-')
+        dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=df_col, how='left', on='Número')
+        dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2].fillna('-')
+        dfs[int(mes_atual) - 2]['Data-De-Coleta_col'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'] + '!' + \
+                                                        dfs[int(mes_atual) - 2]['Data-De-Coleta_col']
+        dfs[int(mes_atual) - 2]['Data-De-Coleta_col'] = dfs[int(mes_atual) - 2]['Data-De-Coleta_col'].apply(
+            func=lambda val: fatiamento(val))
+        dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta_col']
         ssw_mes_m = search_data(name_m_ant)  # DF do mês -1
         e_ssw1 = ssw_mes_m.query("Ult_Status == ' MERCADORIA ENTREGUE (01)'")  # DF com apenas as notas entregues
         a_ssw1 = ssw_mes_m.query("Ult_Status == ' ENTREGA AGENDADA (15)'")  # DF com apenas as notas entregues
@@ -269,26 +274,32 @@ if mes_atual != '1':
         dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].fillna('-')
         dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].astype(dtype='str')
         dfs[int(mes_atual) - 2]['Lead-Time'] = dfs[int(mes_atual) - 2]['Lead-Time'].astype(dtype='str')
-        dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=df_urano, how='left', on='Número', copy=False)
+        dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=df_urano, how='left', on='Número',
+                                           copy=False)
         dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=qy_ent, how='left', on='Número')
         dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2].drop_duplicates(subset=['Número'], keep='first')
         dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2].fillna('-')
-        dfs[int(mes_atual) - 2]['Emissão_cte'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'] + '!' + dfs[int(mes_atual) - 2][
-            'Emissão_cte']
-        dfs[int(mes_atual) - 2]['Data_Ocorrência1'] = dfs[int(mes_atual) - 2]['D_Entrega'] + '!' + dfs[int(mes_atual) - 2][
-            'Data_Ocorrência1']
+        dfs[int(mes_atual) - 2]['Emissão_cte'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'] + '!' + \
+                                                 dfs[int(mes_atual) - 2][
+                                                     'Emissão_cte']
+        dfs[int(mes_atual) - 2]['Data_Ocorrência1'] = dfs[int(mes_atual) - 2]['D_Entrega'] + '!' + \
+                                                      dfs[int(mes_atual) - 2][
+                                                          'Data_Ocorrência1']
         dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2].fillna('-')
-        dfs[int(mes_atual) - 2]['Emissão_cte'] = dfs[int(mes_atual) - 2]['Emissão_cte'].apply(func=lambda val: fatiamento(val))
+        dfs[int(mes_atual) - 2]['Emissão_cte'] = dfs[int(mes_atual) - 2]['Emissão_cte'].apply(
+            func=lambda val: fatiamento(val))
         dfs[int(mes_atual) - 2]['Data_Ocorrência1'] = dfs[int(mes_atual) - 2]['Data_Ocorrência1'].apply(
             func=lambda val: fatiamento(val))
         dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Emissão_cte']
         dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['Data_Ocorrência1']
         dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2].fillna('-')
-        dfs[int(mes_atual) - 2]['Lead-Time'] = dfs[int(mes_atual) - 2]['Lead-Time'].apply(func=lambda val: conversor_ldt(val))
+        dfs[int(mes_atual) - 2]['Lead-Time'] = dfs[int(mes_atual) - 2]['Lead-Time'].apply(
+            func=lambda val: conversor_ldt(val))
         dfs[int(mes_atual) - 2]['Previsão-Entrega'] = dfs[int(mes_atual) - 2]['Previsão-Entrega'].astype(dtype='str')
         dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].astype(dtype='str')
         dfs[int(mes_atual) - 2]['Dias-Para-Entrega'] = dfs[int(mes_atual) - 2]['Previsão-Entrega'] + '!' + \
-                                                       dfs[int(mes_atual) - 2]['D_Entrega'] + '!' + dfs[int(mes_atual) - 2][
+                                                       dfs[int(mes_atual) - 2]['D_Entrega'] + '!' + \
+                                                       dfs[int(mes_atual) - 2][
                                                            'Lead-Time']
         dfs[int(mes_atual) - 2]['Dias-Para-Entrega'] = dfs[int(mes_atual) - 2]['Dias-Para-Entrega'].apply(
             func=lambda val: dias_p_entrega(val))
@@ -296,12 +307,16 @@ if mes_atual != '1':
             lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
         dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].apply(
             lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
+        dfs[int(mes_atual) - 2]['Lead-Time'] = dfs[int(mes_atual) - 2]['Lead-Time'].apply(
+            func=lambda val: pd.to_numeric(arg=val, errors='coerce'))
+        dfs[int(mes_atual) - 2]['Lead-Time'] = dfs[int(mes_atual) - 2]['Lead-Time'].fillna('-')
     except NameError:
         # Exceção já tratada no IF
         pass
 
-
-
+dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].apply(
+    lambda val: to_date_time(val))
+dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
 
 ############################
 cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
@@ -358,7 +373,8 @@ try:
 
         for z in cols:
             for cell in ws[z]:
-                cell.style = default_style
+                if cell not in dates:
+                    cell.style = default_style
 
             if z == 'A' or 'B':
                 ws.column_dimensions[z].width = 9
@@ -400,7 +416,7 @@ try:
                 ws.column_dimensions[z].width = 14
 
             if z == 'S':
-                ws.column_dimensions[z].width = 30
+                ws.column_dimensions[z].width = 48
 
             # Index
             col = z + '1'
@@ -429,13 +445,13 @@ for c in cols[0:3]:
         cell.style = style2
 
     if c == 'A':
-        ws.column_dimensions[c].width = 40
+        ws.column_dimensions[c].width = 45
 
     if c == 'B':
-        ws.column_dimensions[c].width = 70
+        ws.column_dimensions[c].width = 75
 
     if c == 'C':
-        ws.column_dimensions[c].width = 50
+        ws.column_dimensions[c].width = 70
 
     # Index
     col = c + '1'
@@ -444,6 +460,7 @@ for c in cols[0:3]:
 ws.merge_cells('A4:A5')
 ws.merge_cells('A6:A11')
 ws.merge_cells('A29:A30')
+ws.merge_cells('A32:A33')
 
 print(sheet_names[0] + ' Incluso na Planilha')
 
