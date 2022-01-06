@@ -183,7 +183,7 @@ def dataf():
             return datetime.date(ano_tual - 1, 12, dia).strftime("%d-%m-%Y")
         else:
             dia = dia_hoje - 1
-            return datetime.date(ano_tual , int(mes_atual), dia).strftime("%d-%m-%Y")
+            return datetime.date(ano_tual, int(mes_atual), dia).strftime("%d-%m-%Y")
 
 
 dest_path = r'K:/CWB/Logistica/Rastreamento/Patrick/Storage/' + ano_atual + '/' + meses[mes_atual].title() + '/' + today
@@ -353,7 +353,10 @@ def conversor_ldt(val):
 
 
 def calc_dias_p_entrega(dia_prev, mes_prev, ano_prev):
-    if dia_prev < int(dia_atual) and mes_prev <= int(mes_atual) and ano_prev <= int(ano_atual):
+    if dia_prev == int(dia_atual):
+        cont = 0
+        return cont if cont >= 0 else f'Em atraso ({cont})'
+    elif dia_prev < int(dia_atual) and mes_prev <= int(mes_atual) and ano_prev <= int(ano_atual):
         uteis = [0, 1, 2, 3, 4]
         cont = 0
         t_loop = True
@@ -377,11 +380,11 @@ def calc_dias_p_entrega(dia_prev, mes_prev, ano_prev):
                 dia_prev = dias_meses[mes_prev]
                 ano_prev = ano_prev + 1
                 cont -= 1
-            if dia_prev == dia_atual:
-                if mes_prev == mes_atual:
-                    if ano_prev == ano_atual:
+            if dia_prev == int(dia_atual):
+                if mes_prev == int(mes_atual):
+                    if ano_prev == int(ano_atual):
                         t_loop = False
-                        return cont
+                        return cont if cont >= 0 else f'Em atraso ({cont})'
     else:
         uteis = [0, 1, 2, 3, 4]
         cont = 0
@@ -410,26 +413,22 @@ def calc_dias_p_entrega(dia_prev, mes_prev, ano_prev):
                 if mes_prev == int(mes_atual):
                     if ano_prev == int(ano_atual):
                         t_loop = False
-        return cont
+        return cont if cont >= 0 else f'Em atraso ({cont})'
 
 
 def dias_p_entrega(val):
-    valor = ''
+    valor = '-'
     l_conc = val.split('!')
     l_prev = l_conc[0]
     l_prev = l_prev.split('-')
-
     if l_conc[1] != '-':
         valor = "Entregue"
     elif l_conc[0] == '-' or l_conc[2] == '-':
         valor = '-'
     else:
-        try:
-            dia_prev = int(l_prev[0])
-            mes_prev = int(l_prev[1])
-            ano_prev = int(l_prev[2])
-            valor = calc_dias_p_entrega(dia_prev, mes_prev, ano_prev)
-        except:
-            valor = '-'
+        dia_prev = int(l_prev[0])
+        mes_prev = int(l_prev[1])
+        ano_prev = int(l_prev[2])
+        valor = calc_dias_p_entrega(dia_prev, mes_prev, ano_prev)
 
     return valor

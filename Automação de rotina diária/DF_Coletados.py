@@ -18,7 +18,9 @@ for file in list(os.listdir(dir_coletas)):
         df_prov.columns = ['Número', 'Data-De-Coleta_col']
         dfs_cols.append(df_prov)
         # shutil.move(src=arq, dst=dir_arq_coletas + today + file)
-
-df_col = pd.concat(objs=dfs_cols, ignore_index=True, keys=['Número', 'Data-De-Coleta_col'])
-df_col['Data-De-Coleta_col'] = df_col['Data-De-Coleta_col'].astype('string')
-df_col['Data-De-Coleta_col'] = df_col['Data-De-Coleta_col'].apply(func=lambda val: conversor(val))
+try:
+    df_col = pd.concat(objs=dfs_cols, ignore_index=True, keys=['Número', 'Data-De-Coleta_col'])
+    df_col['Data-De-Coleta_col'] = df_col['Data-De-Coleta_col'].astype('string')
+    df_col['Data-De-Coleta_col'] = df_col['Data-De-Coleta_col'].apply(func=lambda val: conversor(val))
+except ValueError:
+    pass
