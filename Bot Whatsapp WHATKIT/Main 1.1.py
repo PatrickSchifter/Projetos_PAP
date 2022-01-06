@@ -41,8 +41,11 @@ print(df_min)
 
 try:
     df_min.columns = ['Número', 'Data']
-except:
-    df_min.columns = ['Número', 'Volumes', 'Transportador', 'Data']
+except ValueError:
+    try:
+        df_min.columns = ['Número', 'Volumes', 'Transportador']
+    except ValueError:
+        df_min.columns = ['Número', 'Volumes', 'Transportador', 'Data']
 
 df_min = df_min['Número']
 frame = pd.merge(left=df_min, right=df_not, how='left', on='Número')
@@ -63,6 +66,8 @@ lista_envios = ['BRUNA TEBALDI', 'PAULO HENRIQUE', 'ARYADNE RONCAGLIO MARTINS']
 #
 print(frame['Fantasia_Comissionado'])
 meu_num = '+5541991912238'
+frame = frame.drop_duplicates('Número','first')
+print(frame)
 
 for row in frame.itertuples(index=True, name='Row'):
     tel_cli = '+' + str(row.Cel_Cliente)

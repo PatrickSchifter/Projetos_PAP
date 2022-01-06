@@ -91,10 +91,13 @@ for x in list(pygetwindow.getAllTitles()):
     if "EVEREST" in x:
         title = x
 
-window = pygetwindow.getWindowsWithTitle(title)[0]
-window.activate()
-window.maximize()
-window.resizeTo(1366, 768)
+try:
+    window = pygetwindow.getWindowsWithTitle(title)[0]
+    window.activate()
+    window.maximize()
+    window.resizeTo(1366, 768)
+except:
+    pass
 
 import Baixar_Notas_Emitidas
 import Concat_plan

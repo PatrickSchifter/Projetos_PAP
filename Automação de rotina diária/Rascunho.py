@@ -1,5 +1,3 @@
-import pyautogui
-import time
+from Variaveis import dataf
 
-time.sleep(5)
-print(pyautogui.position())
+print(dataf())

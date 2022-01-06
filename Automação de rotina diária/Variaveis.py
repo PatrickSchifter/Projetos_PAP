@@ -41,6 +41,7 @@ meses = {"01": "janeiro",
          "11": "novembro",
          "12": "dezembro"}
 
+
 def columns_to_datetime(val):
     val[11] = pd.to_datetime(arg=val[11], errors='coerce', format='%d-%m-%Y')
     print(val[11])
@@ -49,6 +50,7 @@ def columns_to_datetime(val):
     val[13] = pd.to_datetime(arg=val[13], errors='coerce', format='%d-%m-%Y')
     val[14] = pd.to_datetime(arg=val[14], errors='coerce', format='%d-%m-%Y')
     return val[11], val[12], val[13], val[14]
+
 
 def to_date_time(val):
     val = pd.to_datetime(arg=val, errors='coerce', format='%d-%m-%Y')
@@ -156,33 +158,32 @@ def dataf():
             else:
                 dia = dia_hoje - 1
                 return datetime.date(ano_tual, int(mes_atual), dia).strftime("%d-%m-%Y")
-    else:
-        if dia_semana == 0:
-            if dia_hoje == 1:
-                dia = dias_meses[12] - 2
-                return datetime.date(ano_tual - 1, 12, dia).strftime("%d-%m-%Y")
+    elif dia_semana == 0:
+        if dia_hoje == 1:
+            dia = dias_meses[12] - 2
+            return datetime.date(ano_tual - 1, 12, dia).strftime("%d-%m-%Y")
 
-            elif dia_hoje == 2:
-                dia = dias_meses[12] - 2
-                return datetime.date(ano_tual - 1, 12, dia).strftime("%d-%m-%Y")
+        elif dia_hoje == 2:
+            dia = dias_meses[12] - 2
+            return datetime.date(ano_tual - 1, 12, dia).strftime("%d-%m-%Y")
 
-            elif dia_hoje == 3:
-                dia = dias_meses[12] - 2
-                return datetime.date(ano_tual - 1, 12, dia).strftime("%d-%m-%Y")
-            elif dia_hoje == 4:
-                dia = dias_meses[12] - 2
-                return datetime.date(ano_tual - 1, 12, dia).strftime("%d-%m-%Y")
+        elif dia_hoje == 3:
+            dia = dias_meses[12] - 2
+            return datetime.date(ano_tual - 1, 12, dia).strftime("%d-%m-%Y")
+        elif dia_hoje == 4:
+            dia = dias_meses[12] - 2
+            return datetime.date(ano_tual - 1, 12, dia).strftime("%d-%m-%Y")
 
-            else:
-                dia = dia_hoje - 3
-                return datetime.date(ano_tual - 1, 12, dia).strftime("%d-%m-%Y")
         else:
-            if dia_hoje == 1:
-                dia = dias_meses[12]
-                return datetime.date(ano_tual - 1, 12, dia).strftime("%d-%m-%Y")
-            else:
-                dia = dia_hoje - 1
-                return datetime.date(ano_tual - 1, 12, dia).strftime("%d-%m-%Y")
+            dia = dia_hoje - 3
+            return datetime.date(ano_tual - 1, 12, dia).strftime("%d-%m-%Y")
+    else:
+        if dia_hoje == 1:
+            dia = dias_meses[12]
+            return datetime.date(ano_tual - 1, 12, dia).strftime("%d-%m-%Y")
+        else:
+            dia = dia_hoje - 1
+            return datetime.date(ano_tual , int(mes_atual), dia).strftime("%d-%m-%Y")
 
 
 dest_path = r'K:/CWB/Logistica/Rastreamento/Patrick/Storage/' + ano_atual + '/' + meses[mes_atual].title() + '/' + today
