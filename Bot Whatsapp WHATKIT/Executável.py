@@ -1,3 +1,5 @@
+import time
+
 import pywhatkit
 import pandas as pd
 import os
@@ -29,6 +31,8 @@ for item in list(os.listdir(path_min)):
     print(item)
     try:
         df_min = pd.read_excel(path_min + item)
+        time.sleep(3)
+        os.remove(path_min + item)
     except PermissionError:
         continue
 
@@ -100,9 +104,3 @@ for rep in df_rep['Fantasia Comissionado']:
         msg = ''
         continue
 
-for item in list(os.listdir(path_min)):
-    try:
-
-        os.remove(path_min + item)
-    except PermissionError:
-        continue
