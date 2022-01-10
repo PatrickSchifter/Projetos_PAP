@@ -65,6 +65,7 @@ frame = frame.fillna(0)
 lista_envios = ['BRUNA TEBALDI', 'PAULO HENRIQUE', 'ARYADNE RONCAGLIO MARTINS']
 #
 print(frame['Fantasia_Comissionado'])
+
 meu_num = '+5541991912238'
 frame = frame.drop_duplicates('Número','first')
 print(frame)

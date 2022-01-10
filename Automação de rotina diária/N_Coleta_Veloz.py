@@ -4,7 +4,7 @@ from selenium import webdriver
 import pyautogui
 import os
 from datetime import datetime
-from Variaveis import dest_path
+from Variaveis import dest_path, ano_atual
 
 path_driver = "K:\CWB\Logistica\Rastreamento\Patrick\Automação\chromedriver_win32\chromedriver.exe"
 
@@ -13,7 +13,7 @@ driver = webdriver.Chrome(executable_path=path_driver)
 link_gdrive = 'https://drive.google.com/drive/folders/1_wfu6sA9Jplfa2uaytx8dXPqIXYMQ9o8?usp=sharing'
 
 driver.get(link_gdrive)
-path_file = 'C:/Users/patrick.paula/Downloads/CONTROLE DE PEDIDOS PAP 2021.xlsx'
+path_file = f'C:/Users/patrick.paula/Downloads/CONTROLE DE PEDIDOS PAP {ano_atual}.xlsx'
 
 time.sleep(3)
 pyautogui.click(332, 332)

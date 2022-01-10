@@ -2,7 +2,7 @@ import pygetwindow
 import pyautogui
 import os
 import time
-from Variaveis import path_dir_tod, dataf, path_r, ano_atual, partial_path
+from Variaveis import path_dir_tod, dataf, path_r, ano_atual, partial_path, p_source_path
 
 # Criação de diretório na rede
 try:
@@ -15,6 +15,12 @@ except FileNotFoundError:
         print('Criado diretório na rede')
 except FileExistsError:
     pass
+
+try:
+    for itens in list(os.listdir(p_source_path)):
+        os.remove(p_source_path + itens)
+except:
+    print('Limpeza da pasta downloads')
 # print('Deu algum erro ao criar o diretório')
 
 # Abertura do Everest

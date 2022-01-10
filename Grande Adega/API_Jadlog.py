@@ -13,7 +13,7 @@ for itens in list(os.listdir(file_notas)):
 
 notas['Unnamed: 1'] = notas['Unnamed: 1'].astype(dtype='str')
 token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOjEwMjgzNSwiZHQiOiIyMDIxMDMxNCJ9.M0ahvMZQ4-HOWDqFWe3Og05ZTeIhvQxkppcIWau1iKs'
-endpoint = 'http://www.jadlog.com.br/embarcador/api/tracking/consultar'
+endpoint = 'https://www.jadlog.com.br/embarcador/api/tracking/consultar'
 nota_exemplo = "5996"
 
 user = '26253785000106'
@@ -29,7 +29,7 @@ request = session.post(url=endpoint, data={"consulta":
                                         headers={"Authorization": token, "Content-Type": "application/json"})
 
 
-
+request = session.post(url=endpoint)
 print(request.text)
 print(request.reason)
 print(request.status_code)

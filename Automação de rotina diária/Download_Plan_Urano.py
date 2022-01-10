@@ -80,7 +80,10 @@ for file in path:
         try:
             shutil.move(file_name, dest_path + '/' + file)
             print('Arquivo da Urano encontrado e renomeado')
-            os.rename(dest_path + '/' + file, dest_path + '/' + full_name_urano)
+            try:
+                os.rename(dest_path + '/' + file, dest_path + '/' + full_name_urano)
+            except FileExistsError:
+                pass
         except FileNotFoundError:
             for window in list(pygetwindow.getWindowsWithTitle()):
                 if "Senior" in window:
