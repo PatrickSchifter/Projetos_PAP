@@ -1,3 +1,3 @@
-from Variaveis import calc_dias_p_entrega
+import pandas as pd
 
-print(calc_dias_p_entrega(6,1,2022))
+list_pd = []

@@ -73,6 +73,12 @@ else:
     dfs[int(mes_atual) - 1] = pd.concat([dfs[int(mes_atual) - 1], df_n],
                                         keys=all_index)
 
+dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].apply(
+    func=lambda val: to_date_time(val))
+
+for x in dfs[int(mes_atual) - 1]['Data-De-Coleta']:
+    print(x)
+
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].astype(dtype='str')
 
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].apply(
@@ -131,9 +137,6 @@ dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].appl
     lambda val: pd.to_numeric(val, 'coerce', 'integer'))
 dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].fillna('-')
 
-for x in dfs[int(mes_atual) - 1]['Emissão']:
-    print(x)
-
 # Processo SSW
 ssw_mes = search_data(name_m_atual)  # DF do mês
 df_ssw_col = ssw_mes.query("Ult_Status == ' MERCADORIA RECEBIDA PARA TRANSPORTE'")
@@ -185,27 +188,31 @@ dfs[int(mes_atual) - 1]['Agendamento'] = dfs[int(mes_atual) - 1]['Descrição']
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].fillna('-')
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].astype(dtype='str')
 dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].astype(dtype='str')
+
 dfs[int(mes_atual) - 1]['N_Previsão'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'] + '!' + dfs[int(mes_atual) - 1][
     'Lead-Time']
+
 dfs[int(mes_atual) - 1]['N_Previsão'] = dfs[int(mes_atual) - 1]['N_Previsão'].apply(func=lambda val: func(val))
+
 dfs[int(mes_atual) - 1]['Previsão-Entrega'] = dfs[int(mes_atual) - 1]['N_Previsão']
 
 # Processo da Urano
-dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=df_urano, how='left', on='Número', copy=False)
+# dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=df_urano, how='left', on='Número', copy=False)
 dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=qy_ent, how='left', on='Número')
 dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].drop_duplicates(subset=['Número'], keep='first')
 dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
-dfs[int(mes_atual) - 1]['Emissão_cte'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'] + '!' + dfs[int(mes_atual) - 1][
-    'Emissão_cte']
+# dfs[int(mes_atual) - 1]['Emissão_cte'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'] + '!' + dfs[int(mes_atual) - 1][
+#     'Emissão_cte']
 dfs[int(mes_atual) - 1]['Data_Ocorrência1'] = dfs[int(mes_atual) - 1]['D_Entrega'] + '!' + dfs[int(mes_atual) - 1][
     'Data_Ocorrência1']
 dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
-dfs[int(mes_atual) - 1]['Emissão_cte'] = dfs[int(mes_atual) - 1]['Emissão_cte'].apply(func=lambda val: fatiamento(val))
+# dfs[int(mes_atual) - 1]['Emissão_cte'] = dfs[int(mes_atual) - 1]['Emissão_cte'].apply(func=lambda val: fatiamento(val))
 dfs[int(mes_atual) - 1]['Data_Ocorrência1'] = dfs[int(mes_atual) - 1]['Data_Ocorrência1'].apply(
     func=lambda val: fatiamento(val))
-dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Emissão_cte']
+# dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Emissão_cte']
 dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['Data_Ocorrência1']
 dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
+
 
 # Processo de Dias para Entrega
 dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].apply(func=lambda val: conversor_ldt(val))
@@ -331,8 +338,12 @@ if mes_atual != '1':
         pass
 
 print("60% concluído")
+
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].apply(
     lambda val: to_date_time(val))
+
+
+
 dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
 
 ############################
@@ -475,9 +486,10 @@ for c in cols[0:3]:
     ws[col].style = index_style
 print("90% concluído")
 ws.merge_cells('A4:A5')
-ws.merge_cells('A6:A11')
+ws.merge_cells('A6:A7')
+ws.merge_cells('A8:A13')
 ws.merge_cells('A29:A30')
-ws.merge_cells('A32:A33')
+ws.merge_cells('A34:A35')
 
 print(sheet_names[0] + ' Incluso na Planilha')
 

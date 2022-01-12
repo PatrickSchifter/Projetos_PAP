@@ -102,6 +102,7 @@ for x in list(pygetwindow.getAllTitles()):
 
 window = pygetwindow.getWindowsWithTitle(title)[0]
 window.activate()
+
 window.maximize()
 window.resizeTo(1366, 768)
 

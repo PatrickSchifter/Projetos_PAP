@@ -1,7 +1,11 @@
+import time
+
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
+from Variáveis import calc_dat_15
+import pyautogui
 
 
 
@@ -27,3 +31,9 @@ submit = driver.find_element_by_name('j_idt15')
 submit.click()
 wait_by_id('j_idt4')
 driver.get('https://www.jadlog.com.br/portalcliente/pages/relatorio_entrega/index.jad')
+wait_by_id('formRelEntFiltro:dtini_input')
+input_dt = driver.find_element_by_id('formRelEntFiltro:dtini_input')
+
+pyautogui.tripleClick(223,434)
+time.sleep(2)
+input_dt.send_keys(calc_dat_15())

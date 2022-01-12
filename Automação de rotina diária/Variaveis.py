@@ -53,8 +53,14 @@ def columns_to_datetime(val):
 
 
 def to_date_time(val):
-    val = pd.to_datetime(arg=val, errors='coerce', format='%d-%m-%Y')
-    valor = val
+    if val != '-' or val != '':
+        val = pd.to_datetime(arg=val, errors='ignore', format='%d-%m-%Y')
+        val = pd.to_datetime(arg=val, errors='ignore', format='%d/%m/%Y')
+        valor = val
+
+    else:
+        valor = '-'
+    print(valor)
     return valor
 
 
@@ -290,6 +296,7 @@ def calc_data(dia, mes, ano, valor_a_somar):
 
 
 def func(val):
+    print(val)
     val_ignore = ['', '-']
     val = val.split('!')
     try:
