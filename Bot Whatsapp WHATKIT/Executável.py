@@ -1,5 +1,4 @@
 import time
-
 import pywhatkit
 import pandas as pd
 import os
@@ -10,6 +9,15 @@ path_min = r'C:\Users\patrick.paula\Porto a Porto Comercio de IMP e EXP LTDA\Afo
 cli_path = r'K:/CWB/Logistica/Rastreamento/Automacoes/WhatsExpedição/Clientes.xls'
 df_rep = r'K:/CWB/Logistica/Rastreamento/Automacoes/WhatsExpedição/Representantes.xlsx'
 
+list_min = list(os.listdir(path_min))
+for item in list_min:
+    print(item)
+    try:
+        df_min = pd.read_excel(path_min + item)
+        time.sleep(3)
+        # os.remove(path_min + item)
+    except PermissionError:
+        continue
 for item in list(os.listdir(dir_path)):
     if 'Clientes' in item:
         pass
@@ -24,17 +32,6 @@ except:
 
 for x in range(0, len(dfs)):
     df_not = pd.concat(objs=dfs, join='outer')
-
-df_min = pd.DataFrame
-
-for item in list(os.listdir(path_min)):
-    print(item)
-    try:
-        df_min = pd.read_excel(path_min + item)
-        time.sleep(3)
-        os.remove(path_min + item)
-    except PermissionError:
-        continue
 
 df_cli = pd.read_excel(cli_path)
 
@@ -71,7 +68,7 @@ lista_envios = ['BRUNA TEBALDI', 'PAULO HENRIQUE', 'ARYADNE RONCAGLIO MARTINS']
 print(frame['Fantasia_Comissionado'])
 
 meu_num = '+5541991912238'
-frame = frame.drop_duplicates('Número','first')
+frame = frame.drop_duplicates('Número', 'first')
 print(frame)
 
 for row in frame.itertuples(index=True, name='Row'):
@@ -103,4 +100,3 @@ for rep in df_rep['Fantasia Comissionado']:
     else:
         msg = ''
         continue
-
