@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-from Variaveis import dest_path, meses, mes_atual, column_veloz, conversor_dt
+from config import dest_path, meses, mes_atual, column_veloz, conversor_dt
 
 """Até o dia 10 deve-se fazer a conferência do mes atual e mes - 1
     Verificar como será o padrão da Veloz ao virar o ano"""

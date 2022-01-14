@@ -1,7 +1,7 @@
 import pandas as pd
-from Variaveis import index_stat, all_index, dest_file, dia_atual, ano_atual, mes_atual, dia_semana, func, file, n_file, \
-    meses_str, manual_index, aut_index, fatiamento, conversor_dt, separador, conversor_ldt, dias_p_entrega, \
-    to_date_time, columns_to_datetime
+from config import index_stat, all_index, dest_file, dia_atual, ano_atual, mes_atual, dia_semana, func, file, n_file, \
+    meses_str, manual_index, aut_index, fatiamento, conversor_dt, conversor_ldt, dias_p_entrega, \
+    to_date_time
 from openpyxl import load_workbook
 from openpyxl.styles import Alignment
 from openpyxl.styles import NamedStyle, Font, Border, Side, PatternFill
@@ -213,7 +213,6 @@ dfs[int(mes_atual) - 1]['Data_Ocorrência1'] = dfs[int(mes_atual) - 1]['Data_Oco
 dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['Data_Ocorrência1']
 dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
 
-
 # Processo de Dias para Entrega
 dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].apply(func=lambda val: conversor_ldt(val))
 dfs[int(mes_atual) - 1]['Previsão-Entrega'] = dfs[int(mes_atual) - 1]['Previsão-Entrega'].astype(dtype='str')
@@ -341,8 +340,6 @@ print("60% concluído")
 
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].apply(
     lambda val: to_date_time(val))
-
-
 
 dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
 

@@ -1,6 +1,6 @@
 import requests
 import pandas as pd
-from Variaveis import itens_ign, all_index, indexes, meses_str, mes_atual, ano_atual
+from config import itens_ign, all_index, indexes, meses_str, mes_atual, ano_atual
 import time
 start_time = time.time()
 

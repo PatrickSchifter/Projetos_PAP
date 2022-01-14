@@ -5,7 +5,7 @@ import json
 import time
 import simplejson
 
-from Variaveis import meses_str, mes_atual, ano_atual, path_dir_tod
+from config import meses_str, mes_atual, ano_atual, path_dir_tod
 
 mes_atual = str(int(mes_atual))
 

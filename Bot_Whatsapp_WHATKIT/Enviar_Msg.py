@@ -15,12 +15,13 @@ for item in list_min:
     try:
         df_min = pd.read_excel(path_min + item)
         time.sleep(3)
-        # os.remove(path_min + item)
+        os.remove(path_min + item)
     except PermissionError:
         continue
 for item in list(os.listdir(dir_path)):
     if 'Clientes' in item:
         pass
+
     else:
         df = pd.read_excel(dir_path + item)
         dfs.append(df)

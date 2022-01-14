@@ -2,7 +2,7 @@ import pygetwindow
 import pyautogui
 import os
 import time
-from Variaveis import path_dir_tod, dataf, path_r, ano_atual, partial_path, p_source_path
+from config import path_dir_tod, dataf, path_r, ano_atual, partial_path, p_source_path
 
 # Criação de diretório na rede
 try:
@@ -128,4 +128,4 @@ time.sleep(1)
 pyautogui.click(1267, 199)
 time.sleep(1)
 
-
+import DF_Qlik

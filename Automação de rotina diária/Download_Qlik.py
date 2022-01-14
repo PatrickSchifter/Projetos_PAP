@@ -8,15 +8,8 @@ import os
 from datetime import datetime
 import shutil
 import pygetwindow
-from Variaveis import meses, dest_path
+from config import meses, dest_path, ac_day, ac_mon, ac_yea, source_path_qlik, dest_path_qlik
 
-ac_day = datetime.today().strftime("%d")
-ac_mon = datetime.today().strftime("%m")
-ac_yea = datetime.today().strftime("%Y")
-
-ac_day = int(ac_day)
-ac_day = str(ac_day)
-teste = 123
 driver = webdriver.Chrome(
     executable_path=r"K:\CWB\Logistica\Rastreamento\Patrick\Automação\chromedriver_win32\chromedriver.exe")
 
@@ -114,15 +107,5 @@ while file_indir:
 time.sleep(1)
 
 driver.close()
-
-partial_name_1 = "Qlik Sense - Planilha de Alimentação de Datas - "
-partial_name_2 = ".xlsx"
-de = " de "
-full_name_qlik = partial_name_1 + ac_day + de + meses[ac_mon] + de + ac_yea + partial_name_2
-today = datetime.today().strftime("%d-%m-%Y")
-p_source_path = "C:/Users/patrick.paula/Downloads/"
-
-source_path_qlik = p_source_path + full_name_qlik
-dest_path_qlik = dest_path + "/" + full_name_qlik
 
 shutil.move(source_path_qlik, dest_path_qlik)

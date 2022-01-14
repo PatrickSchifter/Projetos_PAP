@@ -205,6 +205,7 @@ index_stat = ['Número', 'N.Pré-Nota', 'Emissão', 'Fantasia-Destinatário', 'C
 path_r = r'K:/CWB/Logistica/Rastreamento/Patrick/Storage/'
 partial_path = r'K:/CWB/Logistica/Rastreamento/Patrick/Storage/' + ano_atual + '/' + meses[mes_atual].title() + '/'
 file = r'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/MONITORAMENTO ' + ano_atual + '.xlsx'
+file_a = r'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/MONITORAMENTO ' + str(int(ano_atual) - 1) + '.xlsx'
 n_file = partial_path + today + '/Notas_emitidas ' + dataf() + '.xlsx'  # Notas do dia anterior
 today = date.today().strftime("%d-%m-%Y")
 
@@ -247,6 +248,15 @@ itens_ign = ['tracking; ', 'success; ', 'message; ', 'header; ', 'remetente; ', 
              'data_hora; ', 'dominio; ', 'filial; ', 'cidade; ', 'ocorrencia; ', 'descricao; ', 'tipo; ',
              'data_hora_efetiva; ', 'nome_recebedor; ', 'nro_doc_recebedor; ',
              '?xml version="1.0" encoding="UTF-8" ?; ', '']
+
+prov_index = ['Empresa', 'PedidoVenda', 'N.F', 'DataEmissão', 'Cliente', 'UF',
+              'Cidade', 'N.F._Situação', 'Deposito', 'Transportador', 'Comissionado',
+              'DataColeta', 'DataAgenda', 'DataEntrega', 'ObservaçãoFrete',
+              'Justificativa']
+index_qlik = ['Empresa', 'Pedido de Venda', 'N.F', 'Data Emissão', 'Cliente', 'UF',
+              'Cidade', 'N.F. Situação', 'Deposito', 'Transportador', 'Comissionado',
+              'Data Coleta', 'Data Agenda', 'Data Entrega', 'Observação Frete',
+              'Justificativa']
 
 
 def calc_data(dia, mes, ano, valor_a_somar):
@@ -439,3 +449,116 @@ def dias_p_entrega(val):
         valor = calc_dias_p_entrega(dia_prev, mes_prev, ano_prev)
 
     return valor
+
+
+def dia_ant_ga():
+    dia_atual_ga = int(datetime.today().strftime('%d'))
+    mes_atual_ga = int(datetime.today().strftime('%m'))
+    ano_atual_ga = int(datetime.today().strftime('%Y'))
+
+    dia_semana_ga = datetime.weekday()
+
+    if dia_semana_ga == 0:
+        if mes_atual_ga != 1:
+            if dia_atual_ga >= 4:
+                if mes_atual_ga < 10:
+                    data_1 = '0' + str(dia_atual_ga - 3) + '/0' + str(mes_atual_ga) + '/' + str(ano_atual_ga)
+                    data_2 = '0' + str(dia_atual_ga - 1) + '/0' + str(mes_atual_ga) + '/' + str(ano_atual_ga)
+                else:
+                    data_1 = '0' + str(dia_atual_ga - 3) + '/' + str(mes_atual_ga) + '/' + str(ano_atual_ga)
+                    data_2 = '0' + str(dia_atual_ga - 1) + '/' + str(mes_atual_ga) + '/' + str(ano_atual_ga)
+                ret = [data_1, data_2]
+                return ret
+            elif dia_atual_ga == 3:
+                if mes_atual_ga < 10:
+                    data_1 = str(dias_meses[mes_atual_ga - 1]) + '/0' + str(mes_atual_ga - 1) + '/' + str(ano_atual_ga)
+                    data_2 = '0' + str(dia_atual_ga - 1) + '/0' + str(mes_atual_ga) + '/' + str(ano_atual_ga)
+                elif mes_atual_ga == 10:
+                    data_1 = str(dias_meses[mes_atual_ga - 1]) + '/0' + str(mes_atual_ga - 1) + '/' + str(ano_atual_ga)
+                    data_2 = '0' + str(dia_atual_ga - 1) + '/' + str(mes_atual_ga) + '/' + str(ano_atual_ga)
+                else:
+                    data_1 = str(dias_meses[mes_atual_ga - 1]) + '/' + str(mes_atual_ga - 1) + '/' + str(ano_atual_ga)
+                    data_2 = '0' + str(dia_atual_ga - 1) + '/' + str(mes_atual_ga) + '/' + str(ano_atual_ga)
+                ret = [data_1, data_2]
+                return ret
+            elif dia_atual_ga == 2:
+                if mes_atual_ga < 10:
+                    data_1 = str(dias_meses[mes_atual_ga - 1] - 1) + '/0' + str(mes_atual_ga - 1) + '/' + str(
+                        ano_atual_ga)
+                    data_2 = '0' + str(dia_atual_ga - 1) + '/0' + str(mes_atual_ga) + '/' + str(ano_atual_ga)
+                elif mes_atual_ga == 10:
+                    data_1 = str(dias_meses[mes_atual_ga - 1] - 1) + '/0' + str(mes_atual_ga - 1) + '/' + str(
+                        ano_atual_ga)
+                    data_2 = '0' + str(dia_atual_ga - 1) + '/' + str(mes_atual_ga) + '/' + str(ano_atual_ga)
+                else:
+                    data_1 = str(dias_meses[mes_atual_ga - 1] - 1) + '/' + str(mes_atual_ga - 1) + '/' + str(
+                        ano_atual_ga)
+                    data_2 = '0' + str(dia_atual_ga - 1) + '/' + str(mes_atual_ga) + '/' + str(ano_atual_ga)
+                ret = [data_1, data_2]
+                return ret
+            elif dia_atual_ga == 1:
+                if mes_atual_ga < 10:
+                    data_1 = str(dias_meses[mes_atual_ga - 1] - 2) + '/0' + str(mes_atual_ga - 1) + '/' + str(
+                        ano_atual_ga)
+                    data_2 = str(dias_meses[mes_atual_ga - 1]) + '/0' + str(mes_atual_ga - 1) + '/' + str(ano_atual_ga)
+                elif mes_atual_ga == 10:
+                    data_1 = str(dias_meses[mes_atual_ga - 1] - 2) + '/0' + str(mes_atual_ga - 1) + '/' + str(
+                        ano_atual_ga)
+                    data_2 = str(dias_meses[mes_atual_ga - 1]) + '/0' + str(mes_atual_ga - 1) + '/' + str(ano_atual_ga)
+                else:
+                    data_1 = str(dias_meses[mes_atual_ga - 1] - 2) + '/' + str(mes_atual_ga - 1) + '/' + str(
+                        ano_atual_ga)
+                    data_2 = str(dias_meses[mes_atual_ga - 1]) + '/' + str(mes_atual_ga - 1) + '/' + str(ano_atual_ga)
+                ret = [data_1, data_2]
+                return ret
+        else:  # Se o mês for Janeiro
+            if dia_atual_ga >= 4:
+                data_1 = '0' + str(dia_atual_ga - 3) + '/0' + str(mes_atual_ga) + '/' + str(ano_atual_ga)
+                data_2 = '0' + str(dia_atual_ga - 1) + '/0' + str(mes_atual_ga) + '/' + str(ano_atual_ga)
+                ret = [data_1, data_2]
+                return ret
+            elif dia_atual_ga == 3:
+                data_1 = str(dias_meses[12]) + '/' + str(12) + '/' + str(ano_atual_ga - 1)
+                data_2 = '0' + str(dia_atual_ga - 1) + '/0' + str(mes_atual_ga) + '/' + str(ano_atual_ga)
+                ret = [data_1, data_2]
+                return ret
+            elif dia_atual_ga == 2:
+                data_1 = str(dias_meses[12] - 1) + '/' + str(12) + '/' + str(ano_atual_ga - 1)
+                data_2 = '0' + str(dia_atual_ga - 1) + '/0' + str(mes_atual_ga) + '/' + str(ano_atual_ga)
+                ret = [data_1, data_2]
+                return ret
+            elif dia_atual_ga == 1:
+                data_1 = str(dias_meses[12] - 2) + '/' + str(12) + '/' + str(ano_atual_ga - 1)
+                data_2 = str(dias_meses[12]) + '/' + str(12) + '/' + str(ano_atual_ga - 1)
+                ret = [data_1, data_2]
+                return ret
+    else:
+        if mes_atual_ga < 10:
+            if dia_atual_ga < 10:
+                data_1 = '0' + str(dia_atual_ga - 1) + '/0' + str(mes_atual_ga) + '/' + str(ano_atual_ga)
+            else:
+                data_1 = str(dia_atual_ga - 1) + '/0' + str(mes_atual_ga) + '/' + str(ano_atual_ga)
+            ret = [data_1, data_1]
+            return ret
+        else:
+            if dia_atual_ga < 10:
+                data_1 = '0' + str(dia_atual_ga - 1) + '/' + str(mes_atual_ga) + '/' + str(ano_atual_ga)
+            else:
+                data_1 = str(dia_atual_ga - 1) + '/' + str(mes_atual_ga) + '/' + str(ano_atual_ga)
+            ret = [data_1, data_1]
+            return ret
+
+
+ac_mon = date.today().strftime("%m")
+ac_yea = date.today().strftime("%Y")
+ac_day = int(dia_atual)
+ac_day = str(ac_day)
+partial_name_1 = "Qlik Sense - Planilha de Alimentação de Datas - "
+partial_name_2 = ".xlsx"
+de = " de "
+full_name_qlik = partial_name_1 + ac_day + de + meses[ac_mon] + de + ac_yea + partial_name_2
+today = date.today().strftime("%d-%m-%Y")
+p_source_path = "C:/Users/patrick.paula/Downloads/"
+
+source_path_qlik = p_source_path + full_name_qlik
+dest_path_qlik = dest_path + "/" + full_name_qlik

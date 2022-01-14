@@ -8,7 +8,7 @@ from datetime import date
 import os
 import shutil
 import pyautogui
-from Variaveis import source_path_urano, dest_path_urano, full_name_urano, dest_path
+from config import source_path_urano, dest_path_urano, full_name_urano, dest_path
 import pygetwindow
 
 

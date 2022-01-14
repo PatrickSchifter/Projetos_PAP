@@ -1,8 +1,10 @@
-import Variaveis
+import config
 import pyautogui
 import os
 import time
-from Variaveis import dataf
+from config import dataf
+import pygetwindow
+
 time.sleep(5)
 pyautogui.rightClick(470, 336)
 pyautogui.click(557, 383)
@@ -42,3 +44,12 @@ for item in itens_indir:
     if "Análise" in item:
         dir = Variaveis.path_dir_tod + '/' + item
         os.rename(dir, name_notas)
+
+for x in list(pygetwindow.getAllTitles()):
+    if "EVEREST" in x:
+        title = x
+
+window = pygetwindow.getWindowsWithTitle(title)[0]
+window.activate()
+window.maximize()
+window.resizeTo(1366, 768)

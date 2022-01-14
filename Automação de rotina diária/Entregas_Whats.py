@@ -2,7 +2,7 @@ import webbrowser as web
 import pyautogui
 import time
 import os
-from Variaveis import path_dir_tod, today
+from config import path_dir_tod, today
 import pandas as pd
 
 web.open(f"https://web.whatsapp.com/send?phone=+5541991912238")

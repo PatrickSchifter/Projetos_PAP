@@ -1,5 +1,5 @@
 import pandas as pd
-from Variaveis import dest_path_urano
+from config import dest_path_urano
 
 df_urano = pd.read_csv(filepath_or_buffer=dest_path_urano, sep=';')
 df_urano.fillna('-')

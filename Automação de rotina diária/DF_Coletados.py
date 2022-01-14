@@ -1,7 +1,7 @@
 import pandas as pd
 from pandas import Series
 import os
-from Variaveis import dir_coletas, dir_arq_coletas, today
+from config import dir_coletas, dir_arq_coletas, today
 import shutil
 
 
