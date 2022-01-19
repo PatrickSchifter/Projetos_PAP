@@ -2,12 +2,15 @@ import time
 import pywhatkit
 import pandas as pd
 import os
+from Enviar_email import enviar_email
 
 def enviar_msg():
     dir_path = r'K:/CWB/Logistica/Rastreamento/Automacoes/WhatsExpedição/Notas/'
     path_min = r'C:/Users/patrick.paula/Porto a Porto Comercio de IMP e EXP LTDA\Afonso Marcon - Minutas_Coleta/'
     cli_path = r'K:/CWB/Logistica/Rastreamento/Automacoes/WhatsExpedição/Clientes.xls'
     df_rep = r'K:/CWB/Logistica/Rastreamento/Automacoes/WhatsExpedição/Representantes.xlsx'
+    df_resp = r'K:/CWB/Logistica/Rastreamento/Automacoes/WhatsExpedição/Responsaveis.xlsx'
+    df_resp = pd.read_excel(io=df_resp, index_col=0)
 
     list_min = list(os.listdir(path_min))
     for item in list_min:
@@ -32,7 +35,6 @@ def enviar_msg():
     df_rep = pd.read_excel(df_rep)
 
     wait_time = 20
-    print(df_min)
 
     try:
         df_min.columns = ['Número', 'Data']
@@ -57,12 +59,11 @@ def enviar_msg():
 
     frame = frame.astype({'N_Pre_Nota': 'int64'})
     frame = frame.fillna(0)
-    #
-    print(frame['Fantasia_Comissionado'])
 
     meu_num = '+5541991912238'
     frame = frame.drop_duplicates('Número', 'first')
-    print(frame)
+
+    body_email = ''
 
     for row in frame.itertuples(index=True, name='Row'):
         tel_cli = '+' + str(row.Cel_Cliente)
@@ -71,6 +72,7 @@ def enviar_msg():
         pywhatkit.sendwhatmsg_instantly(phone_no=tel_cli,
                                         message=msg_cli, wait_time=wait_time,
                                         tab_close=True, close_time=2)
+        body_email += f'NF {row.Número} - Pré-Nota {row.N_Pre_Nota} - {row.Razao_Social} \n'
 
     msg_vz = 'Prezado representante, informamos que as seguintes notas estão em rota de entrega: \n \nEssa é uma mensagem automática, por gentileza não responder.'
 
@@ -84,7 +86,8 @@ def enviar_msg():
         msg += 'Essa é uma mensagem automática, por gentileza não responder.'
 
         if msg != msg_vz:
-            print(row.Celular_Comissionado)
+            print(row.Fantasia_Comissionado)
+            representante = row.Fantasia_Comissionado
             tel_com = '+' + str(row.Celular_Comissionado)
             pywhatkit.sendwhatmsg_instantly(phone_no=tel_com, wait_time=wait_time,
                                             message=msg,
@@ -93,3 +96,8 @@ def enviar_msg():
         else:
             msg = ''
             continue
+
+
+    enviar_email(df_resp.loc[representante]['email'], body_email)
+
+enviar_msg()

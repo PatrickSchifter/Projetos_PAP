@@ -20,7 +20,8 @@ for file in list(os.listdir(dir_coletas)):
         # shutil.move(src=arq, dst=dir_arq_coletas + today + file)
 try:
     df_col = pd.concat(objs=dfs_cols, ignore_index=True, keys=['Número', 'Data-De-Coleta_col'])
-    df_col['Data-De-Coleta_col'] = df_col['Data-De-Coleta_col'].astype('string')
+    df_col['Data-De-Coleta_col'] = df_col['Data-De-Coleta_col'].astype('str')
     df_col['Data-De-Coleta_col'] = df_col['Data-De-Coleta_col'].apply(func=lambda val: conversor(val))
+
 except ValueError:
     pass

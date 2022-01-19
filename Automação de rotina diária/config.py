@@ -53,14 +53,15 @@ def columns_to_datetime(val):
 
 
 def to_date_time(val):
-    if val != '-' or val != '':
-        val = pd.to_datetime(arg=val, errors='ignore', format='%d-%m-%Y')
-        val = pd.to_datetime(arg=val, errors='ignore', format='%d/%m/%Y')
+    if len(val) > 1:
+        if val[2] == '-':
+            val = pd.to_datetime(arg=val, errors='ignore', format='%d-%m-%Y')
+        elif val[2] == '/':
+            val = pd.to_datetime(arg=val, errors='ignore', format='%d/%m/%Y')
         valor = val
 
     else:
         valor = '-'
-    print(valor)
     return valor
 
 
@@ -221,6 +222,9 @@ indexes = ['Número', 'Data', 'Transportadora', 'Filial', 'Cidade/Estado', 'Ult_
 
 aut_index = ['Número', 'N.Pré-Nota', 'Emissão', 'Fantasia-Destinatário', 'Cidade-Destinatário', 'Uf',
              'Natureza-Fiscal', 'Situação-Fiscal', 'Descrição-Do-Depósito', 'Fantasia_Do_Transportador',
+             'Fantasia-Comissionado', '1', '2']
+aut_index_a = ['Número', 'N.Pré-Nota', 'Emissão', 'Fantasia-Destinatário', 'Cidade-Destinatário', 'Uf',
+             'Natureza-Fiscal', 'Situação-Fiscal', 'Descrição-Do-Depósito', 'Fantasia_Do_Transportador',
              'Fantasia-Comissionado']
 
 manual_index = ['Data-De-Coleta', 'Previsão-Entrega', 'D_Entrega', 'Agendamento', 'Lead-Time',
@@ -249,7 +253,7 @@ itens_ign = ['tracking; ', 'success; ', 'message; ', 'header; ', 'remetente; ', 
              'data_hora_efetiva; ', 'nome_recebedor; ', 'nro_doc_recebedor; ',
              '?xml version="1.0" encoding="UTF-8" ?; ', '']
 
-prov_index = ['Empresa', 'PedidoVenda', 'N.F', 'DataEmissão', 'Cliente', 'UF',
+prov_index = ['Empresa', 'PedidoVenda', 'NF', 'DataEmissão', 'Cliente', 'UF',
               'Cidade', 'N.F._Situação', 'Deposito', 'Transportador', 'Comissionado',
               'DataColeta', 'DataAgenda', 'DataEntrega', 'ObservaçãoFrete',
               'Justificativa']
@@ -419,7 +423,7 @@ def calc_dias_p_entrega(dia_prev, mes_prev, ano_prev):
                     dia_prev -= 1
             elif dia_prev == 0 and mes_prev != 1:
                 mes_prev = mes_prev - 1
-                dia_prev = dias_meses[mes_prev - 1]
+                dia_prev = dias_meses[mes_prev]
                 cont += 1
             else:
                 mes_prev = 12
@@ -434,6 +438,7 @@ def calc_dias_p_entrega(dia_prev, mes_prev, ano_prev):
 
 
 def dias_p_entrega(val):
+    print(val)
     valor = '-'
     l_conc = val.split('!')
     l_prev = l_conc[0]

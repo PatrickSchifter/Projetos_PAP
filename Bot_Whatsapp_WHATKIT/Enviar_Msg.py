@@ -10,14 +10,12 @@ cli_path = r'K:/CWB/Logistica/Rastreamento/Automacoes/WhatsExpedição/Clientes.
 df_rep = r'K:/CWB/Logistica/Rastreamento/Automacoes/WhatsExpedição/Representantes.xlsx'
 
 list_min = list(os.listdir(path_min))
-for item in list_min:
-    print(item)
-    try:
-        df_min = pd.read_excel(path_min + item)
-        time.sleep(3)
-        os.remove(path_min + item)
-    except PermissionError:
-        continue
+print(list_min)
+df_min = pd.read_excel(path_min + list_min[1])
+time.sleep(3)
+print('Teste')
+
+    # os.remove(path_min + item)
 for item in list(os.listdir(dir_path)):
     if 'Clientes' in item:
         pass
@@ -39,7 +37,6 @@ df_cli = pd.read_excel(cli_path)
 df_rep = pd.read_excel(df_rep)
 
 wait_time = 20
-print(df_min)
 
 try:
     df_min.columns = ['Número', 'Data']
@@ -48,8 +45,9 @@ except ValueError:
         df_min.columns = ['Número', 'Volumes', 'Transportador']
     except ValueError:
         df_min.columns = ['Número', 'Volumes', 'Transportador', 'Data']
-
+print(df_min['Número'])
 df_min = df_min['Número']
+# df_min = df_min['Número'].astype(dtype='str')
 frame = pd.merge(left=df_min, right=df_not, how='left', on='Número')
 frame = frame.fillna('0')
 frame = frame.query("Destinatário != '0'")

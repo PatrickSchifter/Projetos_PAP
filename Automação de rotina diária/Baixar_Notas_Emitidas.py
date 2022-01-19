@@ -27,8 +27,8 @@ pyautogui.click(516, 226)
 
 time.sleep(5)
 
-path = os.path.realpath(Variaveis.path_dir_tod)
-os.startfile(Variaveis.path_dir_tod)
+path = os.path.realpath(config.path_dir_tod)
+os.startfile(config.path_dir_tod)
 time.sleep(2)
 pyautogui.click(552, 307)
 
@@ -37,12 +37,12 @@ with pyautogui.hold('ctrlright'):
 
 time.sleep(5)
 
-itens_indir = list(os.listdir(Variaveis.path_dir_tod))
-name_notas = Variaveis.path_dir_tod + '/Notas_emitidas ' + dataf() + '.xlsx'
+itens_indir = list(os.listdir(config.path_dir_tod))
+name_notas = config.path_dir_tod + '/Notas_emitidas ' + dataf() + '.xlsx'
 
 for item in itens_indir:
     if "Análise" in item:
-        dir = Variaveis.path_dir_tod + '/' + item
+        dir = config.path_dir_tod + '/' + item
         os.rename(dir, name_notas)
 
 for x in list(pygetwindow.getAllTitles()):

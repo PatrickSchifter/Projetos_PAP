@@ -1,7 +1,6 @@
 import requests
 import pandas as pd
-import os
-import json
+from config import conversor_dt, to_date_time
 import time
 import simplejson
 
@@ -112,6 +111,10 @@ for itens in rqts:
                 continue
 
 df_jad = pd.DataFrame(list_info)
+df_jad['data'] = df_jad['data'].apply(func=lambda val: conversor_dt(val))
+df_jad['data'] = df_jad['data'].apply(func=lambda val: val if len(val) > 5 else '-')
+df_jad['data'] = df_jad['data'].apply(func=lambda val: to_date_time(val))
+print(df_jad)
 writer = pd.ExcelWriter(path_dir_tod + '/Relatório Jadlog.xlsx')
 df_jad.to_excel(excel_writer=writer, index=False)
 writer.save()

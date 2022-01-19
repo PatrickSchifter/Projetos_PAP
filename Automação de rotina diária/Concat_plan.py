@@ -1,7 +1,7 @@
 import pandas as pd
 from config import index_stat, all_index, dest_file, dia_atual, ano_atual, mes_atual, dia_semana, func, file, n_file, \
     meses_str, manual_index, aut_index, fatiamento, conversor_dt, conversor_ldt, dias_p_entrega, \
-    to_date_time
+    to_date_time, aut_index_a
 from openpyxl import load_workbook
 from openpyxl.styles import Alignment
 from openpyxl.styles import NamedStyle, Font, Border, Side, PatternFill
@@ -52,7 +52,10 @@ except IndexError:
     pass
 print("10% concluído")
 df_n.columns = aut_index
-
+for x in df_n['Número']:
+    print(x)
+df_n = df_n[aut_index_a]
+df_n = df_n.dropna()
 for x in manual_index:
     df_n[x] = ''
 
@@ -73,11 +76,10 @@ else:
     dfs[int(mes_atual) - 1] = pd.concat([dfs[int(mes_atual) - 1], df_n],
                                         keys=all_index)
 
+dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].astype(dtype='str')
+
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].apply(
     func=lambda val: to_date_time(val))
-
-for x in dfs[int(mes_atual) - 1]['Data-De-Coleta']:
-    print(x)
 
 dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].astype(dtype='str')
 
@@ -85,6 +87,7 @@ dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Col
     func=lambda val: conversor_dt(val))
 dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
 try:
+    dfs[int(mes_atual) - 1]['Número'] = dfs[int(mes_atual) - 1]['Número'].apply(func=lambda val: pd.to_numeric(val))
     dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=df_col, how='left', on='Número')
     dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
     dfs[int(mes_atual) - 1]['Data-De-Coleta_col'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'] + '!' + \
