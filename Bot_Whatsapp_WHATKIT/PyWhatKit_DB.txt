@@ -6528,3 +6528,33 @@ Time: 9:12
 Phone Number: +5541998280807
 Message: Prezado representante, informamos que as seguintes notas estão em rota de entrega: NF 424572 / Pré-Nota 1192666 - 348 CURITIBA RESTAURANTE LIMITADA - ME NF 424571 / Pré-Nota 1192663 - R14 RESTAURANTE, EVENTOS E RECEPCOES EIRELI NF 424557 / Pré-Nota 1192626 - EMPORIO FAMILIA RICIERI LTDA Essa é uma mensagem automática, por gentileza não responder.
 --------------------
+Date: 20/1/2022
+Time: 15:28
+Phone Number: +554130195088.0
+Message: Prezado cliente, informamos que seu pedido com a Porto a Porto NF 424555 já saiu para entrega e em breve estará chegando em seu estabelecimento! Obs: Essa é uma mensagem automática, por gentileza não responder.
+--------------------
+Date: 20/1/2022
+Time: 15:28
+Phone Number: +554130195088.0
+Message: Prezado cliente, informamos que seu pedido com a Porto a Porto NF 424554 já saiu para entrega e em breve estará chegando em seu estabelecimento! Obs: Essa é uma mensagem automática, por gentileza não responder.
+--------------------
+Date: 20/1/2022
+Time: 15:28
+Phone Number: +5541999231675.0
+Message: Prezado cliente, informamos que seu pedido com a Porto a Porto NF 424569 já saiu para entrega e em breve estará chegando em seu estabelecimento! Obs: Essa é uma mensagem automática, por gentileza não responder.
+--------------------
+Date: 20/1/2022
+Time: 15:29
+Phone Number: +5541996986391.0
+Message: Prezado cliente, informamos que seu pedido com a Porto a Porto NF 424570 já saiu para entrega e em breve estará chegando em seu estabelecimento! Obs: Essa é uma mensagem automática, por gentileza não responder.
+--------------------
+Date: 20/1/2022
+Time: 15:29
+Phone Number: +5541999722858
+Message: Prezado representante, informamos que as seguintes notas estão em rota de entrega: NF 424555 / Pré-Nota 1192522 - CASA NOBRE ESPECIARIAS LTDA Essa é uma mensagem automática, por gentileza não responder.
+--------------------
+Date: 20/1/2022
+Time: 15:29
+Phone Number: +5541998280807
+Message: Prezado representante, informamos que as seguintes notas estão em rota de entrega: NF 424569 / Pré-Nota 1192660 - LILIAN JULIANE TULIO BURATTI 00364377941 NF 424570 / Pré-Nota 1192662 - LPC RESTAURANTE EIRELI - EPP Essa é uma mensagem automática, por gentileza não responder.
+--------------------

@@ -18,19 +18,25 @@ if len(info_notas) > 1:
             for clean in clean_carac:
                 info = info.replace(clean, '')
 
+            if 'nr_prenota' in info:
+                print(info)
+
             if 'cd_deposito' in info:
                 data_notas.append(nota)
                 info = info.split(':')
                 nota = {'cd_deposito': '', 'id_workflowestagio': '', 'itens': []}
                 nota['cd_deposito'] = info[1]
+                print(info)
 
             elif 'id_workflowestagio' in info:
                 info = info.split(':')
                 nota['id_workflowestagio'] = info[1]
+                print(info)
 
             elif 'id_workflowestagio' in info:
                 info = info.split(':')
                 nota['id_workflowestagio'] = info[1]
+                print(info)
 
             elif 'qt_embalagem' in info:
                 info = info.split(':')
@@ -38,17 +44,29 @@ if len(info_notas) > 1:
                 info[1][0] = int(info[1][0])
                 if info[1][0] > 0:
                     nota['itens'].append(info[1][0])
+                print(info)
 
             elif 'cd_item_nota' in info:
                 info = info.split(':')
                 nota['itens'].append(info[1])
+                print(info)
 
 df_itens = pd.DataFrame(data_notas)
-writer = pd.ExcelWriter(path='C:/Users/patrick.paula/Desktop/Testes/Teste_guia.xlsx')
-df_itens.to_excel(excel_writer=writer, sheet_name='Sugestão_Guia', index=False)
-writer.save()
+
 
 df_itens = df_itens.query("id_workflowestagio != '3' & id_workflowestagio != '6'")  # Filtro de não faturados
+
+"""
+Faturamento - 4
+Bloqueado - 1
+Liberado - 2
+Separação - 5
+Faturado - 6
+Faturado - 3
+Faturamento Veloz - 7
+Cliente Retira - 8
+"""
+
 
 df_itens2 = df_itens = df_itens.query("cd_deposito == '2'")
 df_itens7 = df_itens = df_itens.query("cd_deposito == '7'")
@@ -78,7 +96,6 @@ def itens(list, dep):
     qtd_atual = 0
     nt_atual = ''
     for item in list:
-        print(item, type(item))
         if type(item) is str:
             nt_atual = item
         elif type(item) is int:
@@ -142,6 +159,7 @@ df_itens16['itens'] = df_itens16['itens'].apply(func=lambda val: itens(val, '16'
 df_itens20['itens'] = df_itens20['itens'].apply(func=lambda val: itens(val, '20'))
 df_itens99['itens'] = df_itens99['itens'].apply(func=lambda val: itens(val, '99'))
 
+
 for item in dict_2:
     dict_2_df['itens'].append(item)
     dict_2_df['qtds'].append(dict_2[item])
@@ -171,6 +189,12 @@ for item in dict_99:
     dict_99_df['qtds'].append(dict_99[item])
 
 df_item_2 = pd.DataFrame(dict_2_df)
+
+writer = pd.ExcelWriter(path='C:/Users/patrick.paula/Desktop/Testes/Teste_guia2.xlsx')
+df_item_2.to_excel(excel_writer=writer, sheet_name='Sugestão_Guia', index=False)
+writer.save()
+
+
 df_item_2.columns = ['Item', 'Quantidade']
 df_item_7 = pd.DataFrame(dict_7_df)
 df_item_7.columns = ['Item', 'Quantidade']
@@ -185,14 +209,3 @@ df_item_20.columns = ['Item', 'Quantidade']
 df_item_99 = pd.DataFrame(dict_99_df)
 df_item_99.columns = ['Item', 'Quantidade']
 
-print(df_item_2)
-"""
-Faturamento - 4
-Bloqueado - 1
-Liberado - 2
-Separação - 5
-Faturado - 6
-Faturado - 3
-Faturamento Veloz - 7
-Cliente Retira - 8
-"""
