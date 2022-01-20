@@ -34,53 +34,53 @@ def calc_data():
     if mes_hoje != 1:
         if data == 0:
             if dia_hoje == 1:
-                dia = dias_meses[int(mes_hoje) - 1] - 3
+                dia = dias_meses[int(mes_hoje) - 1] - 12
                 return date(ano_hoje, (mes_hoje - 1), dia).strftime("%d-%m-%Y")
 
             elif dia_hoje == 2:
-                dia = dias_meses[int(mes_hoje) - 1] - 2
+                dia = dias_meses[int(mes_hoje) - 1] - 12
                 return date(ano_hoje, int(mes_hoje) - 1, dia).strftime("%d-%m-%Y")
 
             elif dia_hoje == 3:
-                dia = dias_meses[int(mes_hoje)] - 1
+                dia = dias_meses[int(mes_hoje)] - 12
                 return date(ano_hoje, int(mes_hoje) - 1, dia).strftime("%d-%m-%Y")
 
             else:
-                dia = dia_hoje - 4
+                dia = dia_hoje - 12
                 return date(ano_hoje, int(mes_hoje), dia).strftime("%d-%m-%Y")
         else:
             if dia_hoje == 1:
-                dia = dias_meses[int(mes_hoje) - 1] -1
+                dia = dias_meses[int(mes_hoje) - 1] - 12
                 return date(ano_hoje, int(mes_hoje) - 1, dia).strftime("%d-%m-%Y")
             else:
-                dia = dia_hoje - 2
+                dia = dia_hoje - 12
                 return date(ano_hoje, int(mes_hoje), dia).strftime("%d-%m-%Y")
     else:
         if data == 0:
             if dia_hoje == 1:
-                dia = dias_meses[12] - 3
+                dia = dias_meses[12] - 12
                 return date(ano_hoje - 1, 12, dia).strftime("%d-%m-%Y")
 
             elif dia_hoje == 2:
-                dia = dias_meses[12] - 3
+                dia = dias_meses[12] - 12
                 return date(ano_hoje - 1, 12, dia).strftime("%d-%m-%Y")
 
             elif dia_hoje == 3:
-                dia = dias_meses[12] - 3
+                dia = dias_meses[12] - 12
                 return date(ano_hoje - 1, 12, dia).strftime("%d-%m-%Y")
             elif dia_hoje == 4:
-                dia = dias_meses[12] - 3
+                dia = dias_meses[12] - 12
                 return date(ano_hoje - 1, 12, dia).strftime("%d-%m-%Y")
 
             else:
-                dia = dia_hoje - 4
+                dia = dia_hoje - 12
                 return date(ano_hoje - 1, 12, dia).strftime("%d-%m-%Y")
         else:
             if dia_hoje == 1:
-                dia = dias_meses[12] - 1
+                dia = dias_meses[12] - 12
                 return date(ano_hoje - 1, 12, dia).strftime("%d-%m-%Y")
             else:
-                dia = dia_hoje - 2
+                dia = dia_hoje - 12
                 return date(ano_hoje, int(mes_hoje), dia).strftime("%d-%m-%Y")
 
 

@@ -1,5 +1,6 @@
 from config import capacity_file, dados_estoque, guia_file
 import pandas as pd
+from pre_nota import df_item_2, df_item_99, df_item_7, df_item_16, df_item_20, df_item_100, df_item_115
 import requests
 
 df_cap = pd.read_excel(io=capacity_file, sheet_name='Capacidade')
@@ -64,40 +65,76 @@ for infor in pages_info:
 df_estoque = pd.DataFrame(list_info)
 df_estoque = df_estoque.query("qt_estoque != 0")
 df_estoque = df_estoque[index]
+
 df_2 = df_estoque.query("cd_deposito == '2'")
 index2 = ['cd_item', 'qt_estoque']
 df_2 = df_2[index2]
+
 df_2.columns = ['Item', 'Show_Room_2']
+df_2 = pd.merge(left=df_2, right=df_item_2, on='Item', how='left')
+df_2 = df_2.fillna(0)
+df_2['Show_Room_3'] = df_2['Show_Room_2'] - df_2['Quantidade']
+# df_2 = df_2[['Item', 'Show_Room_2']]
+
+writer = pd.ExcelWriter(path='C:/Users/patrick.paula/Desktop/Testes/Teste_guia.xlsx')
+df_2.to_excel(excel_writer=writer, sheet_name='Sugestão_Guia', index=False)
+writer.save()
+
+
 
 df_7 = df_estoque.query("cd_deposito == '7'")
 index7 = ['cd_item', 'ds_item', 'qt_estoque']
 df_7 = df_7[index7]
 df_7.columns = ['Item', 'Descrição_Item', 'Veloz_7']
+df_7 = pd.merge(left=df_7, right=df_item_7, on='Item', how='left')
+df_7 = df_7.fillna(0)
+df_7['Veloz_7'] = df_7['Veloz_7'] - df_7['Quantidade']
+df_7 = df_7[['Item', 'Descrição_Item', 'Veloz_7']]
 
 df_100 = df_estoque.query("cd_deposito == '100'")
 index100 = ['cd_item', 'qt_estoque']
 df_100 = df_100[index100]
 df_100.columns = ['Item', 'Caixas_Pardas_Veloz_100']
+df_100 = pd.merge(left=df_100, right=df_item_100, on='Item', how='left')
+df_100 = df_100.fillna(0)
+df_100['Caixas_Pardas_Veloz_100'] = df_100['Caixas_Pardas_Veloz_100'] - df_100['Quantidade']
+df_100 = df_100[['Item', 'Caixas_Pardas_Veloz_100']]
 
 df_115 = df_estoque.query("cd_deposito == '115'")
 index115 = ['cd_item', 'qt_estoque']
 df_115 = df_115[index115]
 df_115.columns = ['Item', 'Bloqueios_115']
+df_115 = pd.merge(left=df_115, right=df_item_115, on='Item', how='left')
+df_115 = df_115.fillna(0)
+df_115['Bloqueios_115'] = df_115['Bloqueios_115'] - df_115['Quantidade']
+df_115 = df_115[['Item', 'Bloqueios_115']]
 
 df_16 = df_estoque.query("cd_deposito == '16'")
 index16 = ['cd_item', 'qt_estoque']
 df_16 = df_16[index16]
 df_16.columns = ['Item', 'Reserva_Madero_16']
+df_16 = pd.merge(left=df_16, right=df_item_16, on='Item', how='left')
+df_16 = df_16.fillna(0)
+df_16['Reserva_Madero_16'] = df_16['Reserva_Madero_16'] - df_16['Quantidade']
+df_16 = df_16[['Item', 'Reserva_Madero_16']]
 
 df_20 = df_estoque.query("cd_deposito == '20'")
 index20 = ['cd_item', 'qt_estoque']
 df_20 = df_20[index20]
 df_20.columns = ['Item', 'Avarias_20']
+df_20 = pd.merge(left=df_20, right=df_item_20, on='Item', how='left')
+df_20 = df_20.fillna(0)
+df_20['Reserva_Madero_16'] = df_20['Avarias_20'] - df_20['Quantidade']
+df_20 = df_20[['Item', 'Avarias_20']]
 
 df_99 = df_estoque.query("cd_deposito == '99'")
 index99 = ['cd_item', 'qt_estoque']
 df_99 = df_99[index99]
 df_99.columns = ['Item', 'Bloqueios_Importação_99']
+df_99 = pd.merge(left=df_99, right=df_item_99, on='Item', how='left')
+df_99 = df_99.fillna(0)
+df_99['Bloqueios_Importação_99'] = df_99['Bloqueios_Importação_99'] - df_99['Quantidade']
+df_99 = df_99[['Item', 'Bloqueios_Importação_99']]
 
 df_guia = pd.merge(left=df_7, right=df_2, how='left', on='Item')
 df_guia = pd.merge(left=df_guia, right=df_100, how='left', on='Item')

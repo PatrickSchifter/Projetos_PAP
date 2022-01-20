@@ -1,6 +1,11 @@
 import pandas as pd
-dict = {'cd_deposito': '2', 'id_workflowestagio': '3', 'itens':[{'qt_embalagem': 6, 'cod_item_nota': 12345}]}
+
+dict = {'Coluna1': [25,23,34,45,34,65], 'Coluna2': [25,23,34,45,34,65]}
 
 
 
-print(dict)
+df = pd.DataFrame(data=dict)
+
+df['Coluna3'] = df['Coluna1'] + df['Coluna2']
+print(df)
+
