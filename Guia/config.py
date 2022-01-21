@@ -106,5 +106,19 @@ def dados_notas(codigo_empresa, pagina):
         time.sleep(1)
         return request.text
 
-
+def format_float(val):
+    val = str('               {:.2f}'.format(val))
+    return val
 # print(dados_estoque('1','2','1'))
+
+def regra_cump():
+    msg = ''
+    hour = int(datetime.today().strftime('%H'))
+    if hour in range(0, 13):
+        msg = 'Prezados, bom dia!!!\nSegue em anexo a analise para solicitação da guia.\n\n\nEsse é um email automático'
+    elif hour in range(13, 18):
+        msg = 'Prezados, boa tarde!!!\nSegue em anexo a analise para solicitação da guia.\n\n\nEsse é um email automático'
+    elif hour in range(18, 00):
+        msg = 'Prezados, boa noite!!!\nSegue em anexo a analise para solicitação da guia.\n\n\nEsse é um email automático'
+
+    return msg

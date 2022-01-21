@@ -89,6 +89,7 @@ def enviar_msg():
             print(row.Fantasia_Comissionado)
             representante = row.Fantasia_Comissionado
             tel_com = '+' + str(row.Celular_Comissionado)
+            print(tel_com)
             pywhatkit.sendwhatmsg_instantly(phone_no=tel_com, wait_time=wait_time,
                                             message=msg,
                                             tab_close=True, close_time=2)

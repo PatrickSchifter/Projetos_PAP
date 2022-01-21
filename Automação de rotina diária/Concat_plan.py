@@ -51,7 +51,10 @@ try:
 except IndexError:
     pass
 print("10% concluído")
-df_n.columns = aut_index
+try:
+    df_n.columns = aut_index
+except ValueError:
+    df_n.columns = df_n.columns = aut_index_a
 for x in df_n['Número']:
     print(x)
 df_n = df_n[aut_index_a]

@@ -1,7 +1,7 @@
 from config import capacity_file, dados_estoque, guia_file
 import pandas as pd
 from pre_nota import df_item_2, df_item_99, df_item_7, df_item_16, df_item_20, df_item_100, df_item_115
-import requests
+
 
 df_cap = pd.read_excel(io=capacity_file, sheet_name='Capacidade')
 df_cap.columns = ['Item', 'Descrição', 'Capacidade_Caixas', 'Capacidade_Unidade', 'Padrão', 'Excluir']
@@ -74,15 +74,8 @@ df_2.columns = ['Item', 'Show_Room_2']
 df_2['Item'] = df_2['Item'].astype(dtype='str')
 df_2 = pd.merge(left=df_2, right=df_item_2, on='Item', how='left')
 df_2 = df_2.fillna(0)
-
 df_2['Show_Room_2'] = df_2['Show_Room_2'].apply(func=lambda val: pd.to_numeric(val))
 
-print(df_2.columns)
-df_2['Show_Room_2'] = df_2['Show_Room_2'] - df_2['Quantidade']
-
-writer = pd.ExcelWriter(path='C:/Users/patrick.paula/Desktop/Testes/Teste_guia.xlsx')
-df_2.to_excel(excel_writer=writer, sheet_name='Sugestão_Guia', index=False)
-writer.save()
 
 df_7 = df_estoque.query("cd_deposito == '7'")
 index7 = ['cd_item', 'ds_item', 'qt_estoque']
