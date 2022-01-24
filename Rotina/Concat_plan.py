@@ -11,6 +11,8 @@ from DF_LeadTime import df_lead
 from DF_Urano import df_urano, qy_ent
 from SSW import name_m_atual, search_data
 from DF_Veloz import df_veloz
+import os
+import shutil
 
 try:
     from DF_Coletados import df_col
@@ -583,3 +585,21 @@ print(sheet_names[1] + ' Incluso na Planilha')
 
 writer.save()
 print("--- %s seconds creation of plan ---" % (time.time() - start_time))
+value = True
+while value:
+    try:
+        os.remove(n_file)
+        shutil.copy(src=dest_file, dst=n_file)
+        value = False
+    except PermissionError:
+        import time
+        import win32com.client as win32
+        outlook = win32.Dispatch('outlook.application')
+        mail = outlook.CreateItem(0)
+        mail.To = 'aline.gomes@portoaporto.com.br; luana.neves@portoaporto.com.br'
+        mail.Subject = 'Mensagem do Robô'
+        mail.Body = 'Olá pessoal, aqui é o robô.\n\nEstou tentando excluir o arquivo de monitoramento para colocar um novinho em folha. Preciso que quem está com ele aberto o feche para que eu possa terminar meu trabalho.\n\nMuito obrigado'
+        mail.Send()
+        time.sleep(300)
+
+

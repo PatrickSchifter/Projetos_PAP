@@ -1,9 +1,4 @@
-import pandas as pd
+import os
+path = 'C:/Users/patrick.paula/Desktop/Testes/teste2.xlsx'
 
-df_resp = r'K:/CWB/Logistica/Rastreamento/Automacoes/WhatsExpedição/Responsaveis.xlsx'
-
-rep = 'VICTORIA REPRESENTACOES'
-
-df_resp = pd.read_excel(io=df_resp, index_col=0)
-
-print(df_resp.loc[rep]['email'])
+os.remove(path)
