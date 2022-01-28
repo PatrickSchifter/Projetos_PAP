@@ -588,8 +588,8 @@ print("--- %s seconds creation of plan ---" % (time.time() - start_time))
 value = True
 while value:
     try:
-        os.remove(n_file)
-        shutil.copy(src=dest_file, dst=n_file)
+        os.remove(file)
+        shutil.copy(src=dest_file, dst=file)
         value = False
     except PermissionError:
         import time

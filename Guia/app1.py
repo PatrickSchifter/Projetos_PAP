@@ -1,9 +1,10 @@
 
 
 def enviar_guia():
-    from down_everest import nome_saldos, path_f
+    from down_everest import down_notas_e, nome_saldos
     import pandas as pd
     from config import capacity_file, guia_file, format_float, regra_cump
+    down_notas_e()
     df_cap = pd.read_excel(io=capacity_file, sheet_name='Capacidade')
     df_cap.columns = ['Item', 'Descrição', 'Capacidade_Caixas', 'Capacidade_Unidade', 'Padrão', 'Excluir']
     df_cap = df_cap[['Item', 'Capacidade_Caixas', 'Capacidade_Unidade', 'Padrão']]

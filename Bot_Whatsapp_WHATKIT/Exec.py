@@ -15,11 +15,13 @@ def enviar_msg():
 
         list_min = list(os.listdir(path_min))
         for item in list_min:
-            print(item)
             try:
                 df_min = pd.read_excel(path_min + item)
                 time.sleep(3)
-                os.remove(path_min + item)
+                if len(list_min) > 2:
+                    item = list_min[1]
+                    os.remove(path_min + item)
+                    continue
             except PermissionError:
                 continue
 
@@ -48,6 +50,7 @@ def enviar_msg():
         df_min = df_min['Número']
 
         frame = pd.merge(left=df_min, right=df_not, how='left', on='Número')
+        print(frame)
         frame = frame.fillna('0')
         frame = frame.query("Destinatário != '0'")
         df_cli.columns = ['Destinatário', 'Fantasia', 'Razão Social', 'CNPJ/CPF', 'Cidade', 'UF', 'Fone', 'Celular Cliente',
@@ -66,6 +69,8 @@ def enviar_msg():
         frame = frame.drop_duplicates('Número', 'first')
 
         body_email = ''
+
+        print(frame)
 
         for row in frame.itertuples(index=True, name='Row'):
             tel_cli = '+' + str(row.Cel_Cliente)
@@ -100,9 +105,9 @@ def enviar_msg():
                 msg = ''
                 continue
 
-
         enviar_email(df_resp.loc[representante]['email'], body_email)
     except:
         pass
 
 enviar_msg()
+

@@ -117,3 +117,5 @@ def down_notas():
     time.sleep(1)
     pyautogui.click(1267, 199)
     time.sleep(1)
+
+down_notas()

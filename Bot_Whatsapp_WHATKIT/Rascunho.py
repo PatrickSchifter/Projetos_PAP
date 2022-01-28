@@ -1,4 +1,4 @@
 import os
-path = 'C:/Users/patrick.paula/Desktop/Testes/teste2.xlsx'
+path_min = r'C:/Users/patrick.paula/Porto a Porto Comercio de IMP e EXP LTDA\Afonso Marcon - Minutas_Coleta/'
 
-os.remove(path)
+print(os.listdir(path_min))

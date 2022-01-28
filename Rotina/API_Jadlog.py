@@ -96,7 +96,7 @@ for itens in rqts:
             if 'nf' in x:
                 y = x.split(':')
                 list_info.append(info)
-                info = {'nf': 'NaN', 'status': 'NaN', 'unidade': 'NaN', 'data': 'NaN'}
+                info = {'nf': '-', 'status': '-', 'unidade': '-', 'data': '-'}
                 info['nf'] = y[1]
             elif 'status' in x:
                 y = x.split(':')
@@ -114,6 +114,7 @@ df_jad = pd.DataFrame(list_info)
 df_jad['data'] = df_jad['data'].apply(func=lambda val: conversor_dt(val))
 df_jad['data'] = df_jad['data'].apply(func=lambda val: val if len(val) > 5 else '-')
 df_jad['data'] = df_jad['data'].apply(func=lambda val: to_date_time(val))
+df_jad['nf'] = df_jad['nf'].apply(func=lambda val: pd.to_numeric(arg=val, errors='coerce'))
 print(df_jad)
 writer = pd.ExcelWriter(path_dir_tod + '/Relatório Jadlog.xlsx')
 df_jad.to_excel(excel_writer=writer, index=False)
