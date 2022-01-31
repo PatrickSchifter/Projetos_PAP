@@ -109,5 +109,4 @@ def enviar_msg():
     except:
         pass
 
-enviar_msg()
 

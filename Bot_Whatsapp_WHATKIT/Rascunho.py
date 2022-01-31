@@ -1,4 +1,5 @@
-import os
-path_min = r'C:/Users/patrick.paula/Porto a Porto Comercio de IMP e EXP LTDA\Afonso Marcon - Minutas_Coleta/'
+import time
+import pyautogui
 
-print(os.listdir(path_min))
+time.sleep(5)
+print(pyautogui.position())

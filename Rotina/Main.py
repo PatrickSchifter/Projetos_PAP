@@ -131,5 +131,3 @@ def main():
     time.sleep(1)
 
     import DF_Qlik
-
-main()

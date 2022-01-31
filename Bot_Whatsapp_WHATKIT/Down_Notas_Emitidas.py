@@ -58,6 +58,18 @@ def down_notas():
 
     time.sleep(1)
 
+    pyautogui.click(818, 198)
+
+    time.sleep(2)
+
+    pyautogui.click(1154, 263)
+
+    time.sleep(2)
+
+    pyautogui.click(119, 146)
+
+    time.sleep(1)
+
     pyautogui.click(254, 138)
 
     time.sleep(2)
@@ -117,5 +129,3 @@ def down_notas():
     time.sleep(1)
     pyautogui.click(1267, 199)
     time.sleep(1)
-
-down_notas()
