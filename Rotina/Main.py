@@ -1,20 +1,21 @@
 
 
+
 def main():
     import pygetwindow
     import pyautogui
     import os
     import time
-    from config import path_dir_tod, dataf, path_r, ano_atual, partial_path, p_source_path
+    from Projetos.Rotina.config import path_dir_tod, dataf, path_r, ano_atual, partial_path, p_source_path
     # Criação de diretório na rede
     try:
         os.mkdir(path_dir_tod)
         print('Criado diretório na rede')
     except FileNotFoundError:
-            os.mkdir(path_r + ano_atual)
-            os.mkdir(partial_path)
-            os.mkdir(path_dir_tod)
-            print('Criado diretório na rede')
+        os.mkdir(path_r + ano_atual)
+        os.mkdir(partial_path)
+        os.mkdir(path_dir_tod)
+        print('Criado diretório na rede')
     except FileExistsError:
         pass
 
