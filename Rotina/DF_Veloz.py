@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-from config import dest_path, meses, mes_atual, column_veloz, conversor_dt
+from Projetos.Rotina.config import dest_path, meses, mes_atual, column_veloz, conversor_dt, dia_hoje
 
 """Até o dia 10 deve-se fazer a conferência do mes atual e mes - 1
     Verificar como será o padrão da Veloz ao virar o ano"""
@@ -10,12 +10,27 @@ for itens in list(os.listdir(dest_path)):
     if 'CONTROLE DE PEDIDOS PAP' in itens:
         path_plan = path_plan + itens
         break
-try:
-    df_veloz = pd.read_excel(io=path_plan, sheet_name=meses[mes_atual].title())
-except ValueError:
-    df_veloz = pd.read_excel(io=path_plan, sheet_name=meses[mes_atual].lower())
-except ValueError:
-    df_veloz = pd.read_excel(io=path_plan, sheet_name=meses[mes_atual].upper())
+
+df_veloz = pd.ExcelFile(path_plan)
+if dia_hoje == 1:
+    if int(mes_atual) < 10:
+        ind_mes = '0' + str(int(mes_atual) - 1)
+    else:
+        ind_mes = mes_atual
+else:
+    ind_mes = mes_atual
+
+sheets = df_veloz.sheet_names
+
+for x in sheets:
+    if x == meses[ind_mes].title():
+        df_veloz = pd.read_excel(io=path_plan, sheet_name=x)
+    elif x == meses[ind_mes].upper():
+        df_veloz = pd.read_excel(path_plan, sheet_name=x)
+    elif x == meses[ind_mes]:
+        df_veloz = pd.read_excel(path_plan, sheet_name=x)
+
+
 df_veloz.columns = column_veloz
 df_veloz = df_veloz[['Número', 'Data_De_Coleta']]
 df_veloz = df_veloz.fillna('-')

@@ -4,7 +4,7 @@ from selenium import webdriver
 import pyautogui
 import os
 from datetime import datetime
-from config import dest_path, ano_atual
+from Projetos.Rotina.config import dest_path, ano_atual
 
 path_driver = "K:\CWB\Logistica\Rastreamento\Patrick\Automação\chromedriver_win32\chromedriver.exe"
 

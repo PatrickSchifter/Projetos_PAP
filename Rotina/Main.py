@@ -1,30 +1,33 @@
-
-
-
 def main():
-    import pygetwindow
     import pyautogui
     import os
     import time
-    from Projetos.Rotina.config import path_dir_tod, dataf, path_r, ano_atual, partial_path, p_source_path
+    from Projetos.Rotina.config import path_dir_tod, dataf, path_r, ano_atual, partial_path, p_source_path, open_window, \
+        dest_path
+    from Projetos.Rotina.Download_Plan_Urano import download_plan_urano
     # Criação de diretório na rede
     try:
         os.mkdir(path_dir_tod)
         print('Criado diretório na rede')
     except FileNotFoundError:
-        os.mkdir(path_r + ano_atual)
-        os.mkdir(partial_path)
-        os.mkdir(path_dir_tod)
-        print('Criado diretório na rede')
-    except FileExistsError:
-        pass
-
+        try:
+            os.mkdir(path_r + ano_atual)
+            os.mkdir(partial_path)
+            os.mkdir(path_dir_tod)
+            print('Criado diretório na rede')
+        except FileExistsError:
+            os.mkdir(partial_path)
+            os.mkdir(path_dir_tod)
     try:
         for itens in list(os.listdir(p_source_path)):
             os.remove(p_source_path + itens)
     except:
         print('Limpeza da pasta downloads')
     # print('Deu algum erro ao criar o diretório')
+
+    from Projetos.Rotina import Download_Qlik
+    download_plan_urano()
+    from Projetos.Rotina import N_Coleta_Veloz
 
     # Abertura do Everest
 
@@ -86,39 +89,11 @@ def main():
 
     pyautogui.click(314, 111)
 
-    time.sleep(2)
+    time.sleep(75)
 
-    import Download_Qlik
-    import Download_Plan_Urano
-    import N_Coleta_Veloz
+    from Projetos.Rotina import Baixar_Notas_Emitidas
 
-    ######################################################################################
-
-    # Localiza a janela do Everest na barra de tarefas e maximiza.
-
-    for x in list(pygetwindow.getAllTitles()):
-        if "EVEREST" in x:
-            title = x
-
-    try:
-        window = pygetwindow.getWindowsWithTitle(title)[0]
-        window.activate()
-        window.maximize()
-        window.resizeTo(1366, 768)
-    except:
-        pass
-
-    import Baixar_Notas_Emitidas
-    import Concat_plan
-
-    for x in list(pygetwindow.getAllTitles()):
-        if "EVEREST" in x:
-            title = x
-
-    window = pygetwindow.getWindowsWithTitle(title)[0]
-    window.activate()
-    window.maximize()
-    window.resizeTo(1366, 768)
+    open_window('EVEREST')
 
     pyautogui.click(1234, 106)
     time.sleep(1)
@@ -131,4 +106,5 @@ def main():
     pyautogui.click(1267, 199)
     time.sleep(1)
 
-    import DF_Qlik
+    from Projetos.Rotina import Concat_plan
+    from Projetos.Rotina import DF_Qlik

@@ -1,7 +1,7 @@
 from datetime import datetime
 import datetime
 from datetime import date
-
+import pygetwindow
 import pandas as pd
 
 dir_coletas = r'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/Automação de Monitoramento/Coletados/'
@@ -42,6 +42,19 @@ meses = {"01": "janeiro",
          "12": "dezembro"}
 
 
+def open_window(aplicação):
+    for x in list(pygetwindow.getAllTitles()):
+        if aplicação in x:
+            title = x
+
+    try:
+        window = pygetwindow.getWindowsWithTitle(title)[0]
+        window.activate()
+        window.maximize()
+        window.resizeTo(1366, 768)
+    except:
+        pass
+
 def columns_to_datetime(val):
     val[11] = pd.to_datetime(arg=val[11], errors='coerce', format='%d-%m-%Y')
     print(val[11])
@@ -53,16 +66,19 @@ def columns_to_datetime(val):
 
 
 def to_date_time(val):
-    if len(val) > 1:
-        if val[2] == '-':
-            val = pd.to_datetime(arg=val, errors='ignore', format='%d-%m-%Y')
-        elif val[2] == '/':
-            val = pd.to_datetime(arg=val, errors='ignore', format='%d/%m/%Y')
-        valor = val
+    try:
+        if len(val) > 1:
+            if val[2] == '-':
+                val = pd.to_datetime(arg=val, errors='ignore', format='%d-%m-%Y')
+            elif val[2] == '/':
+                val = pd.to_datetime(arg=val, errors='ignore', format='%d/%m/%Y')
+            valor = val
 
-    else:
-        valor = '-'
-    return valor
+        else:
+            valor = '-'
+        return valor
+    except TypeError:
+        return val
 
 
 def fatiamento(val):
@@ -195,7 +211,7 @@ def dataf():
 dest_path = r'K:/CWB/Logistica/Rastreamento/Patrick/Storage/' + ano_atual + '/' + meses[mes_atual].title() + '/' + today
 dia_ontem = int(date.today().strftime('%d')) - 1
 ano_atual_i = int(date.today().strftime('%Y'))
-yest = date(ano_atual_i, int(mes_atual), dia_ontem).strftime("%d-%m-%Y")
+yest = dataf()
 
 index_stat = ['Número', 'N.Pré-Nota', 'Emissão', 'Fantasia-Destinatário', 'Cidade-Destinatário', 'Uf',
               'Natureza-Fiscal', 'Situação-Fiscal', 'Descrição-Do-Depósito', 'Fantasia_Do_Transportador',
@@ -309,7 +325,6 @@ def calc_data(dia, mes, ano, valor_a_somar):
 
 
 def func(val):
-    print(val)
     val_ignore = ['', '-']
     val = val.split('!')
     try:
@@ -405,6 +420,39 @@ def calc_dias_p_entrega(dia_prev, mes_prev, ano_prev):
                     if ano_prev == int(ano_atual):
                         t_loop = False
                         return cont if cont >= 0 else f'Em atraso ({cont})'
+    elif mes_prev < int(mes_atual) and ano_prev <= int(ano_atual):
+        uteis = [0, 1, 2, 3, 4]
+        cont = 0
+        t_loop = True
+        while t_loop:
+            try:
+                data = date.weekday(datetime.date(ano_prev, mes_prev, dia_prev))
+            except:
+                pass
+            if dia_prev > 0:
+                if data in uteis:
+                    dia_prev += 1
+                    cont -= 1
+                else:
+                    dia_prev += 1
+            elif dia_prev == 0 and mes_prev != 12:
+                mes_prev = mes_prev + 1
+                dia_prev = dias_meses[mes_prev + 1]
+                cont -= 1
+            else:
+                mes_prev = 1
+                dia_prev = dias_meses[mes_prev]
+                ano_prev = ano_prev + 1
+                cont -= 1
+            if dia_prev >= dias_meses[mes_prev]:
+                mes_prev += 1
+                dia_prev = 1
+            if dia_prev == int(dia_atual):
+                if mes_prev == int(mes_atual):
+                    if ano_prev == int(ano_atual):
+                        t_loop = False
+                        return cont if cont >= 0 else f'Em atraso ({cont})'
+
     else:
         uteis = [0, 1, 2, 3, 4]
         cont = 0

@@ -1,7 +1,14 @@
 import pandas as pd
-from config import dest_path_urano
+from Projetos.Rotina.config import dest_path_urano
+from Projetos.Rotina.Download_Plan_Urano import download_plan_urano
+import time
 
-df_urano = pd.read_csv(filepath_or_buffer=dest_path_urano, sep=';')
+try:
+    df_urano = pd.read_csv(filepath_or_buffer=dest_path_urano, sep=';')
+except FileNotFoundError:
+    download_plan_urano()
+    time.sleep(2)
+    df_urano = pd.read_csv(filepath_or_buffer=dest_path_urano, sep=';')
 df_urano.fillna('-')
 df_urano = df_urano.rename(columns={'Numero NF-e': 'Número', 'Data de emissao CT-e': "Emissão_cte",
                                     'Descricao Ocorrencia CT-e': 'Ocorrência',

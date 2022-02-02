@@ -1,6 +1,6 @@
 import requests
 import pandas as pd
-from config import itens_ign, all_index, indexes, meses_str, mes_atual, ano_atual
+from Projetos.Rotina.config import itens_ign, all_index, indexes, meses_str, mes_atual, ano_atual, dia_atual
 import time
 start_time = time.time()
 
@@ -8,7 +8,10 @@ url = 'https://ssw.inf.br/api/tracking'
 cnpj = '00069957000194'
 file_m_atual = r'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/MONITORAMENTO ' + ano_atual + '.xlsx'
 file_m_ant = r'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/MONITORAMENTO' + str(int(ano_atual) - 1) + 'xlsx'
-name_m_atual = meses_str[str(int(mes_atual))].upper() + '-' + str(ano_atual)
+if dia_atual == '01':
+    name_m_atual = meses_str[str(int(mes_atual) - 1)].upper() + '-' + str(ano_atual)
+else:
+    name_m_atual = meses_str[str(int(mes_atual))].upper() + '-' + str(ano_atual)
 if mes_atual == '1':
     name_m_ant = meses_str['12'].upper() + '-' + str(int(ano_atual) - 1)
 else:

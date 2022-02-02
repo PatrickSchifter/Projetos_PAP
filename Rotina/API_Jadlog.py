@@ -4,20 +4,35 @@ from config import conversor_dt, to_date_time
 import time
 import simplejson
 
-from config import meses_str, mes_atual, ano_atual, path_dir_tod
+from config import meses_str, mes_atual, ano_atual, path_dir_tod, dia_atual
 
 mes_atual = str(int(mes_atual))
+if dia_atual == '01':
+    sheet_m = meses_str[str(int(mes_atual)-1)] + '-' + ano_atual
+    mes_atual_ant = str(int(mes_atual) - 2)
+    sheet_a = meses_str[(mes_atual_ant)] + '-' + ano_atual
+else:
+    sheet_m = meses_str[(mes_atual)] + '-' + ano_atual
+    mes_atual_ant = str(int(mes_atual) - 1)
+    sheet_a = meses_str[(mes_atual_ant)] + '-' + ano_atual
+    try:
+        sheet_m_a = meses_str[str(int(mes_atual) - 1)]
+    except KeyError:
+        pass
 
-sheet_m = meses_str[(mes_atual)] + '-' + ano_atual
-try:
-    sheet_m_a = meses_str[str(int(mes_atual) - 1)]
-except KeyError:
-    pass
+
 
 file_ga = 'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/MONITORAMENTO GA 2022.xlsx'
+
 df_ga = pd.read_excel(io=file_ga, sheet_name=sheet_m)
 df_ga = df_ga.fillna('-')
 df_ga = df_ga.query("D_Entrega == '-'")
+
+
+
+df_ga_m = pd.read_excel(io=file_ga, sheet_name=sheet_a)
+df_ga_m = df_ga_m.fillna('-')
+df_ga_m = df_ga_m.query("D_Entrega == '-'")
 
 token = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOjEwMjgzNSwiZHQiOiIyMDIxMDMxNCJ9.M0ahvMZQ4-HOWDqFWe3Og05ZTeIhvQxkppcIWau1iKs'
 endpoint = 'http://www.jadlog.com.br/embarcador/api/tracking/consultar'
@@ -39,6 +54,33 @@ def notas_f(nota):
 
 cont = 0
 for nota in df_ga['Número']:
+    l_notas.append(notas_f(nota))
+    cont += 1
+    if cont == 40:
+        d = {
+            "consulta": l_notas
+        }
+        h = {"Authorization": token, "Content-Type": "application/json"}
+        payload = simplejson.dumps(d)
+
+        request = requests.post(url=endpoint, data=payload, headers=h)
+        rqts.append(request.text)
+        cont = 0
+        l_notas = []
+        time.sleep(1)
+
+d = {
+    "consulta": l_notas
+}
+h = {"Authorization": token, "Content-Type": "application/json"}
+payload = simplejson.dumps(d)
+
+request = requests.post(url=endpoint, data=payload, headers=h)
+rqts.append(request.text)
+cont = 0
+l_notas = []
+
+for nota in df_ga_m['Número']:
     l_notas.append(notas_f(nota))
     cont += 1
     if cont == 40:

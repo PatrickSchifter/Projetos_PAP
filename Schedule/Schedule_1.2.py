@@ -1,6 +1,6 @@
 import schedule
 import time
-from Exec import enviar_msg
+from Projetos.Bot_Whatsapp_WHATKIT.Exec import enviar_msg
 from Projetos.Guia.app1 import enviar_guia
 from Projetos.Rotina.Main import main
 from Projetos.Bot_Whatsapp_WHATKIT.Down_Notas_Emitidas import down_notas

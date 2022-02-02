@@ -8,7 +8,7 @@ import os
 from datetime import datetime
 import shutil
 import pygetwindow
-from config import meses, dest_path, ac_day, ac_mon, ac_yea, source_path_qlik, dest_path_qlik
+from Projetos.Rotina.config import meses, dest_path, ac_day, ac_mon, ac_yea, source_path_qlik, dest_path_qlik
 
 driver = webdriver.Chrome(
     executable_path=r"K:\CWB\Logistica\Rastreamento\Patrick\Automação\chromedriver_win32\chromedriver.exe")

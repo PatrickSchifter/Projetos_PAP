@@ -1,5 +1,6 @@
 import pandas as pd
-from config import index_stat, all_index, dest_file, dia_atual, ano_atual, mes_atual, dia_semana, func, file, n_file, \
+from Projetos.Rotina.config import index_stat, all_index, dest_file, dia_atual, ano_atual, mes_atual, dia_semana, func, \
+    file, n_file, \
     meses_str, manual_index, aut_index, fatiamento, conversor_dt, conversor_ldt, dias_p_entrega, \
     to_date_time, aut_index_a
 from openpyxl import load_workbook
@@ -7,10 +8,10 @@ from openpyxl.styles import Alignment
 from openpyxl.styles import NamedStyle, Font, Border, Side, PatternFill
 from openpyxl import Workbook
 import time
-from DF_LeadTime import df_lead
-from DF_Urano import df_urano, qy_ent
-from SSW import name_m_atual, search_data
-from DF_Veloz import df_veloz
+from Projetos.Rotina.DF_LeadTime import df_lead
+from Projetos.Rotina.DF_Urano import df_urano, qy_ent
+from Projetos.Rotina.SSW import name_m_atual, search_data
+from Projetos.Rotina.DF_Veloz import df_veloz
 import os
 import shutil
 
@@ -38,33 +39,43 @@ itens_comp.append(df)
 
 df_n = pd.read_excel(n_file, engine='openpyxl')
 
+mon_outplan = []
 dfs = []
 
 try:
     for dfss in range(1, 13):
         dfss = str(dfss)
+        sheet = meses_str[dfss] + '-' + ano_atual
         try:
-            df = pd.read_excel(file, engine='openpyxl', sheet_name=meses_str[dfss] + '-' + ano_atual)
+            df = pd.read_excel(file, engine='openpyxl', sheet_name=sheet)
             df.columns = all_index
         except ValueError:
+            mon_outplan.append(sheet)
             continue
 
         dfs.append(df)
 except IndexError:
     pass
+
+date_f = str(df_n['D. Emissão'].iloc[0])
+date_f = str(int(date_f[5:7]))
+if meses_str[date_f] + '-' + ano_atual in mon_outplan:
+    from Projetos.Rotina import Create_month
+
 print("10% concluído")
 try:
     df_n.columns = aut_index
 except ValueError:
     df_n.columns = df_n.columns = aut_index_a
-for x in df_n['Número']:
-    print(x)
 df_n = df_n[aut_index_a]
 df_n = df_n.dropna()
 for x in manual_index:
     df_n[x] = ''
 
 if int(dia_atual) == 1:
+    ind_mes = int(mes_atual) - 2
+    ind_mes_a = int(mes_atual) - 3
+
     if int(dia_atual) == 2 and dia_semana == 0:
         dfs[int(mes_atual) - 2] = pd.concat([dfs[int(mes_atual) - 2], df_n],
                                             keys=all_index)
@@ -77,29 +88,31 @@ if int(dia_atual) == 1:
                                         keys=all_index)
 else:
     print('Incluido notas emitidas do dia anterior')
-
+    ind_mes = int(mes_atual) - 1
+    ind_mes_a = int(mes_atual) - 2
+    print(dfs)
     dfs[int(mes_atual) - 1] = pd.concat([dfs[int(mes_atual) - 1], df_n],
                                         keys=all_index)
 
-dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].astype(dtype='str')
+dfs[ind_mes]['Data-De-Coleta'] = dfs[ind_mes]['Data-De-Coleta'].astype(dtype='str')
 
-dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].apply(
+dfs[ind_mes]['Data-De-Coleta'] = dfs[ind_mes]['Data-De-Coleta'].apply(
     func=lambda val: to_date_time(val))
 
-dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].astype(dtype='str')
+dfs[ind_mes]['Data-De-Coleta'] = dfs[ind_mes]['Data-De-Coleta'].astype(dtype='str')
 
-dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].apply(
+dfs[ind_mes]['Data-De-Coleta'] = dfs[ind_mes]['Data-De-Coleta'].apply(
     func=lambda val: conversor_dt(val))
-dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
+dfs[ind_mes] = dfs[ind_mes].fillna('-')
 try:
-    dfs[int(mes_atual) - 1]['Número'] = dfs[int(mes_atual) - 1]['Número'].apply(func=lambda val: pd.to_numeric(val))
-    dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=df_col, how='left', on='Número')
-    dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
-    dfs[int(mes_atual) - 1]['Data-De-Coleta_col'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'] + '!' + \
-                                                    dfs[int(mes_atual) - 1]['Data-De-Coleta_col']
-    dfs[int(mes_atual) - 1]['Data-De-Coleta_col'] = dfs[int(mes_atual) - 1]['Data-De-Coleta_col'].apply(
+    dfs[ind_mes]['Número'] = dfs[ind_mes]['Número'].apply(func=lambda val: pd.to_numeric(val))
+    dfs[ind_mes] = pd.merge(left=dfs[ind_mes], right=df_col, how='left', on='Número')
+    dfs[ind_mes] = dfs[ind_mes].fillna('-')
+    dfs[ind_mes]['Data-De-Coleta_col'] = dfs[ind_mes]['Data-De-Coleta'] + '!' + \
+                                         dfs[ind_mes]['Data-De-Coleta_col']
+    dfs[ind_mes]['Data-De-Coleta_col'] = dfs[ind_mes]['Data-De-Coleta_col'].apply(
         func=lambda val: fatiamento(val))
-    dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta_col']
+    dfs[ind_mes]['Data-De-Coleta'] = dfs[ind_mes]['Data-De-Coleta_col']
 except NameError:
     print('Não há novas atualizações de data de coleta')
 
@@ -127,25 +140,26 @@ if mes_atual != '1':
 print("20% concluído")
 
 # Processo Veloz
-dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=df_veloz, how='left', on='Número')
-dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
-dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].astype(dtype='str')
-dfs[int(mes_atual) - 1]['Data_De_Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'] + '!' + \
-                                            dfs[int(mes_atual) - 1]['Data_De_Coleta']
-dfs[int(mes_atual) - 1]['Data_De_Coleta'] = dfs[int(mes_atual) - 1]['Data_De_Coleta'].apply(
+dfs[ind_mes] = pd.merge(left=dfs[ind_mes], right=df_veloz, how='left', on='Número')
+dfs[ind_mes] = dfs[ind_mes].fillna('-')
+dfs[ind_mes]['Data-De-Coleta'] = dfs[ind_mes]['Data-De-Coleta'].astype(dtype='str')
+dfs[ind_mes]['Data_De_Coleta'] = dfs[ind_mes]['Data-De-Coleta'] + '!' + \
+                                 dfs[ind_mes]['Data_De_Coleta']
+dfs[ind_mes]['Data_De_Coleta'] = dfs[ind_mes]['Data_De_Coleta'].apply(
     func=lambda val: fatiamento(val))
-dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data_De_Coleta']
+dfs[ind_mes]['Data-De-Coleta'] = dfs[ind_mes]['Data_De_Coleta']
 
 # Processo Lead Time
-dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=df_lead, how='left',
-                                   on=['Cidade-Destinatário', 'Uf', 'Fantasia_Do_Transportador'], copy=False)
-dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].drop_duplicates(subset=['Número'], keep='first')
-dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead_Time']
-dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].apply(
+dfs[ind_mes] = pd.merge(left=dfs[ind_mes], right=df_lead, how='left',
+                        on=['Cidade-Destinatário', 'Uf', 'Fantasia_Do_Transportador'], copy=False)
+dfs[ind_mes] = dfs[ind_mes].drop_duplicates(subset=['Número'], keep='first')
+dfs[ind_mes]['Lead-Time'] = dfs[ind_mes]['Lead_Time']
+dfs[ind_mes]['Lead-Time'] = dfs[ind_mes]['Lead-Time'].apply(
     lambda val: pd.to_numeric(val, 'coerce', 'integer'))
-dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].fillna('-')
+dfs[ind_mes]['Lead-Time'] = dfs[ind_mes]['Lead-Time'].fillna('-')
 
 # Processo SSW
+
 ssw_mes = search_data(name_m_atual)  # DF do mês
 df_ssw_col = ssw_mes.query("Ult_Status == ' MERCADORIA RECEBIDA PARA TRANSPORTE'")
 df_ssw_ent = ssw_mes.query("Ult_Status == ' MERCADORIA ENTREGUE (01)'")
@@ -156,200 +170,192 @@ df_ssw_ent['Data'] = df_ssw_ent['Data'].apply(
     func=lambda val: val[8:12] + '-' + val[5:7] + '-' + val[:4] if len(val) > 3 else val)
 ssw_mes = ssw_mes[['Número', 'Data', 'Cidade/Estado', 'Ult_Status']]
 ssw_mes['Status'] = ssw_mes['Ult_Status'] + ' - ' + ssw_mes['Cidade/Estado']
-dfs[int(mes_atual) - 1]['Agendamento'] = dfs[int(mes_atual) - 1]['Agendamento'].astype(dtype='str', copy=True)
-dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega'].astype(dtype='str', copy=True)
-dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega'].apply(
+dfs[ind_mes]['Agendamento'] = dfs[ind_mes]['Agendamento'].astype(dtype='str', copy=True)
+dfs[ind_mes]['D_Entrega'] = dfs[ind_mes]['D_Entrega'].astype(dtype='str', copy=True)
+dfs[ind_mes]['D_Entrega'] = dfs[ind_mes]['D_Entrega'].apply(
     func=lambda val: conversor_dt(val))
-dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=df_ssw_col, how='left', on='Número')
-dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
-dfs[int(mes_atual) - 1]['Data'] = dfs[int(mes_atual) - 1]['Data'].astype(dtype='str')
-dfs[int(mes_atual) - 1]['Data'] = dfs[int(mes_atual) - 1]['Data'].apply(func=lambda val: conversor_dt(val))
-dfs[int(mes_atual) - 1]['Data'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'] + '!' + dfs[int(mes_atual) - 1]['Data']
-dfs[int(mes_atual) - 1]['Data'] = dfs[int(mes_atual) - 1]['Data'].apply(func=lambda val: fatiamento(val))
-dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data']
-dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1][all_index]
+dfs[ind_mes] = pd.merge(left=dfs[ind_mes], right=df_ssw_col, how='left', on='Número')
+dfs[ind_mes] = dfs[ind_mes].fillna('-')
+dfs[ind_mes]['Data'] = dfs[ind_mes]['Data'].astype(dtype='str')
+dfs[ind_mes]['Data'] = dfs[ind_mes]['Data'].apply(func=lambda val: conversor_dt(val))
+dfs[ind_mes]['Data'] = dfs[ind_mes]['Data-De-Coleta'] + '!' + dfs[ind_mes]['Data']
+dfs[ind_mes]['Data'] = dfs[ind_mes]['Data'].apply(func=lambda val: fatiamento(val))
+dfs[ind_mes]['Data-De-Coleta'] = dfs[ind_mes]['Data']
+dfs[ind_mes] = dfs[ind_mes][all_index]
 print("30% concluído")
-dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=df_ssw_ent, how='left', on='Número')
-dfs[int(mes_atual) - 1].fillna('-', inplace=True)
-dfs[int(mes_atual) - 1]['Data'] = dfs[int(mes_atual) - 1]['D_Entrega'] + '!' + dfs[int(mes_atual) - 1]['Data']
-dfs[int(mes_atual) - 1]['Data'] = dfs[int(mes_atual) - 1]['Data'].apply(
+dfs[ind_mes] = pd.merge(left=dfs[ind_mes], right=df_ssw_ent, how='left', on='Número')
+dfs[ind_mes].fillna('-', inplace=True)
+dfs[ind_mes]['Data'] = dfs[ind_mes]['D_Entrega'] + '!' + dfs[ind_mes]['Data']
+dfs[ind_mes]['Data'] = dfs[ind_mes]['Data'].apply(
     func=lambda val: fatiamento(val))
-dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['Data']
-dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1][all_index]
-dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=ssw_mes, how='left')
-dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1][index_stat]
-dfs[int(mes_atual) - 1].columns = all_index
-dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=df_ssw_age, how='left', on='Número')
-dfs[int(mes_atual) - 1]['Descrição'] = dfs[int(mes_atual) - 1]['Descrição'].fillna('')
-dfs[int(mes_atual) - 1]['Agendamento'] = dfs[int(mes_atual) - 1]['Agendamento'].apply(
+dfs[ind_mes]['D_Entrega'] = dfs[ind_mes]['Data']
+dfs[ind_mes] = dfs[ind_mes][all_index]
+dfs[ind_mes] = pd.merge(left=dfs[ind_mes], right=ssw_mes, how='left')
+dfs[ind_mes] = dfs[ind_mes][index_stat]
+dfs[ind_mes].columns = all_index
+dfs[ind_mes] = pd.merge(left=dfs[ind_mes], right=df_ssw_age, how='left', on='Número')
+dfs[ind_mes]['Descrição'] = dfs[ind_mes]['Descrição'].fillna('')
+dfs[ind_mes]['Agendamento'] = dfs[ind_mes]['Agendamento'].apply(
     func=lambda val: val[8:10] + val[5:7] + val[2:4] if len(val) > 4 else '')
-dfs[int(mes_atual) - 1]['Descrição'] = dfs[int(mes_atual) - 1]['Agendamento'] + '!' + dfs[int(mes_atual) - 1][
+dfs[ind_mes]['Descrição'] = dfs[ind_mes]['Agendamento'] + '!' + dfs[ind_mes][
     'Descrição']
-dfs[int(mes_atual) - 1]['Descrição'] = dfs[int(mes_atual) - 1]['Descrição'].replace(to_replace='!', value='',
-                                                                                    regex=True)
-dfs[int(mes_atual) - 1]['Descrição'] = dfs[int(mes_atual) - 1]['Descrição'].astype(dtype='str', copy=True)
-dfs[int(mes_atual) - 1]['Descrição'] = dfs[int(mes_atual) - 1]['Descrição'].apply(
+dfs[ind_mes]['Descrição'] = dfs[ind_mes]['Descrição'].replace(to_replace='!', value='',
+                                                              regex=True)
+dfs[ind_mes]['Descrição'] = dfs[ind_mes]['Descrição'].astype(dtype='str', copy=True)
+dfs[ind_mes]['Descrição'] = dfs[ind_mes]['Descrição'].apply(
     func=lambda val: val[-6:-4] + '-' + val[-4:-2] + '-' + '20' + val[-2:] if len(val) > 1 else '-')
-dfs[int(mes_atual) - 1]['Agendamento'] = dfs[int(mes_atual) - 1]['Descrição']
+dfs[ind_mes]['Agendamento'] = dfs[ind_mes]['Descrição']
 
 # Processo de Previsão de Entrega
-dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].fillna('-')
-dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].astype(dtype='str')
-dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].astype(dtype='str')
+dfs[ind_mes]['Data-De-Coleta'] = dfs[ind_mes]['Data-De-Coleta'].fillna('-')
+dfs[ind_mes]['Data-De-Coleta'] = dfs[ind_mes]['Data-De-Coleta'].astype(dtype='str')
+dfs[ind_mes]['Lead-Time'] = dfs[ind_mes]['Lead-Time'].astype(dtype='str')
 
-dfs[int(mes_atual) - 1]['N_Previsão'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'] + '!' + dfs[int(mes_atual) - 1][
+dfs[ind_mes]['N_Previsão'] = dfs[ind_mes]['Data-De-Coleta'] + '!' + dfs[ind_mes][
     'Lead-Time']
 
-dfs[int(mes_atual) - 1]['N_Previsão'] = dfs[int(mes_atual) - 1]['N_Previsão'].apply(func=lambda val: func(val))
+dfs[ind_mes]['N_Previsão'] = dfs[ind_mes]['N_Previsão'].apply(func=lambda val: func(val))
 
-dfs[int(mes_atual) - 1]['Previsão-Entrega'] = dfs[int(mes_atual) - 1]['N_Previsão']
+dfs[ind_mes]['Previsão-Entrega'] = dfs[ind_mes]['N_Previsão']
 
 # Processo da Urano
-# dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=df_urano, how='left', on='Número', copy=False)
-dfs[int(mes_atual) - 1] = pd.merge(left=dfs[int(mes_atual) - 1], right=qy_ent, how='left', on='Número')
-dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].drop_duplicates(subset=['Número'], keep='first')
-dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
-# dfs[int(mes_atual) - 1]['Emissão_cte'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'] + '!' + dfs[int(mes_atual) - 1][
-#     'Emissão_cte']
-dfs[int(mes_atual) - 1]['Data_Ocorrência1'] = dfs[int(mes_atual) - 1]['D_Entrega'] + '!' + dfs[int(mes_atual) - 1][
+dfs[ind_mes] = pd.merge(left=dfs[ind_mes], right=qy_ent, how='left', on='Número')
+dfs[ind_mes] = dfs[ind_mes].drop_duplicates(subset=['Número'], keep='first')
+dfs[ind_mes] = dfs[ind_mes].fillna('-')
+dfs[ind_mes]['Data_Ocorrência1'] = dfs[ind_mes]['D_Entrega'] + '!' + dfs[ind_mes][
     'Data_Ocorrência1']
-dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
-# dfs[int(mes_atual) - 1]['Emissão_cte'] = dfs[int(mes_atual) - 1]['Emissão_cte'].apply(func=lambda val: fatiamento(val))
-dfs[int(mes_atual) - 1]['Data_Ocorrência1'] = dfs[int(mes_atual) - 1]['Data_Ocorrência1'].apply(
+dfs[ind_mes] = dfs[ind_mes].fillna('-')
+dfs[ind_mes]['Data_Ocorrência1'] = dfs[ind_mes]['Data_Ocorrência1'].apply(
     func=lambda val: fatiamento(val))
-# dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Emissão_cte']
-dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['Data_Ocorrência1']
-dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
+dfs[ind_mes]['D_Entrega'] = dfs[ind_mes]['Data_Ocorrência1']
+dfs[ind_mes] = dfs[ind_mes].fillna('-')
 
 # Processo de Dias para Entrega
-dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].apply(func=lambda val: conversor_ldt(val))
-dfs[int(mes_atual) - 1]['Previsão-Entrega'] = dfs[int(mes_atual) - 1]['Previsão-Entrega'].astype(dtype='str')
-dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega'].astype(dtype='str')
-dfs[int(mes_atual) - 1]['Dias-Para-Entrega'] = dfs[int(mes_atual) - 1]['Previsão-Entrega'] + '!' + \
-                                               dfs[int(mes_atual) - 1]['D_Entrega'] + '!' + dfs[int(mes_atual) - 1][
-                                                   'Lead-Time']
+dfs[ind_mes]['Lead-Time'] = dfs[ind_mes]['Lead-Time'].apply(func=lambda val: conversor_ldt(val))
+dfs[ind_mes]['Previsão-Entrega'] = dfs[ind_mes]['Previsão-Entrega'].astype(dtype='str')
+dfs[ind_mes]['D_Entrega'] = dfs[ind_mes]['D_Entrega'].astype(dtype='str')
+dfs[ind_mes]['Dias-Para-Entrega'] = dfs[ind_mes]['Previsão-Entrega'] + '!' + \
+                                    dfs[ind_mes]['D_Entrega'] + '!' + dfs[ind_mes][
+                                        'Lead-Time']
 print("40% concluído")
-dfs[int(mes_atual) - 1]['Dias-Para-Entrega'] = dfs[int(mes_atual) - 1]['Dias-Para-Entrega'].apply(
+dfs[ind_mes]['Dias-Para-Entrega'] = dfs[ind_mes]['Dias-Para-Entrega'].apply(
     func=lambda val: dias_p_entrega(val))
 
 # Conversões finais
-dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].apply(
+dfs[ind_mes]['Data-De-Coleta'] = dfs[ind_mes]['Data-De-Coleta'].apply(
     lambda val: to_date_time(val))
-dfs[int(mes_atual) - 1]['D_Entrega'] = dfs[int(mes_atual) - 1]['D_Entrega'].apply(
+dfs[ind_mes]['D_Entrega'] = dfs[ind_mes]['D_Entrega'].apply(
     lambda val: to_date_time(val))
-dfs[int(mes_atual) - 1]['Previsão-Entrega'] = dfs[int(mes_atual) - 1]['Previsão-Entrega'].apply(
+dfs[ind_mes]['Previsão-Entrega'] = dfs[ind_mes]['Previsão-Entrega'].apply(
     lambda val: to_date_time(val))
-dfs[int(mes_atual) - 1]['Agendamento'] = dfs[int(mes_atual) - 1]['Agendamento'].apply(
+dfs[ind_mes]['Agendamento'] = dfs[ind_mes]['Agendamento'].apply(
     lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
-dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].apply(
+dfs[ind_mes]['Lead-Time'] = dfs[ind_mes]['Lead-Time'].apply(
     func=lambda val: pd.to_numeric(arg=val, errors='coerce'))
-dfs[int(mes_atual) - 1]['Lead-Time'] = dfs[int(mes_atual) - 1]['Lead-Time'].fillna('-')
+dfs[ind_mes]['Lead-Time'] = dfs[ind_mes]['Lead-Time'].fillna('-')
 
-if mes_atual != '1':
-    try:
+if dia_atual != '01' and mes_atual != '01':
+    if mes_atual != '1':
+        try:
+            dfs[ind_mes_a]['Data-De-Coleta'] = dfs[ind_mes_a]['Data-De-Coleta'].astype(dtype='str')
 
-        dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].astype(dtype='str')
-
-        # por algum motivo aqui buga e converte a dfs[int(mes_atual) - 1]['Data-De-Coleta'] para str
-        dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].apply(
-            func=lambda val: conversor_dt(val))
-        dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2].fillna('-')
-        dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=df_col, how='left', on='Número')
-        dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2].fillna('-')
-        dfs[int(mes_atual) - 2]['Data-De-Coleta_col'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'] + '!' + \
-                                                        dfs[int(mes_atual) - 2]['Data-De-Coleta_col']
-        dfs[int(mes_atual) - 2]['Data-De-Coleta_col'] = dfs[int(mes_atual) - 2]['Data-De-Coleta_col'].apply(
-            func=lambda val: fatiamento(val))
-        dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta_col']
-        ssw_mes_m = search_data(name_m_ant)  # DF do mês -1
-        e_ssw1 = ssw_mes_m.query("Ult_Status == ' MERCADORIA ENTREGUE (01)'")  # DF com apenas as notas entregues
-        a_ssw1 = ssw_mes_m.query("Ult_Status == ' ENTREGA AGENDADA (15)'")  # DF com apenas as notas entregues
-        a_ssw1['Descrição'] = a_ssw1['Descrição'].apply(func=lambda val: val[19:26] if len(val) > 5 else '')
-        e_ssw1['Data'] = e_ssw1['Data'].astype(dtype='str', copy=True)
-        e_ssw1['Data'] = e_ssw1['Data'].apply(
-            func=lambda val: val[8:12] + '-' + val[5:7] + '-' + val[:4] if len(val) > 3 else val)
-        ssw_mes_m = ssw_mes_m[['Número', 'Data', 'Cidade/Estado', 'Ult_Status']]
-        ssw_mes_m['Status'] = ssw_mes_m['Ult_Status'] + ' - ' + ssw_mes_m['Cidade/Estado']
-        dfs[int(mes_atual) - 2]['Agendamento'] = dfs[int(mes_atual) - 2]['Agendamento'].astype(dtype='str', copy=True)
-        dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].astype(dtype='str', copy=True)
-        dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].apply(
-            func=lambda val: val[8:10] + '-' + val[5:7] + '-' + val[0:4] if len(val) > 3 else val)
-        dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=e_ssw1, how='left', on='Número')
-        dfs[int(mes_atual) - 2].fillna('-', inplace=True)
-        dfs[int(mes_atual) - 2]['Data'] = dfs[int(mes_atual) - 2]['Data'].astype(dtype='str', copy=True)
-        dfs[int(mes_atual) - 2]['B_data'] = dfs[int(mes_atual) - 2]['D_Entrega'] + '!' + dfs[int(mes_atual) - 2]['Data']
-        dfs[int(mes_atual) - 2]['Data'] = dfs[int(mes_atual) - 2]['B_data'].apply(
-            func=lambda val: val[0:11] if len(val) > 11 else val)
-        dfs[int(mes_atual) - 2]['Data'] = dfs[int(mes_atual) - 2]['Data'].replace(to_replace='!', value='', regex=True)
-        dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['Data']
-        dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2][all_index]
-        dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=ssw_mes_m, how='left')
-        dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2][index_stat]
-        dfs[int(mes_atual) - 2].columns = all_index
-        dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=a_ssw1, how='left', on='Número')
-        dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Descrição'].fillna('')
-        dfs[int(mes_atual) - 2]['Agendamento'] = dfs[int(mes_atual) - 2]['Agendamento'].apply(
-            func=lambda val: val[0:10] if len(val) > 4 else '')
-        print("50% concluído")
-        dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Agendamento'] + '!' + dfs[int(mes_atual) - 1][
-            'Descrição']
-        dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Descrição'].replace(to_replace='!', value='',
-                                                                                            regex=True)
-        dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Descrição'].astype(dtype='str', copy=True)
-        dfs[int(mes_atual) - 2]['Descrição'] = dfs[int(mes_atual) - 2]['Descrição'].apply(
-            func=lambda val: val[-6:-4] + '-' + val[-4:-2] + '-' + '20' + val[-2:] if len(val) > 1 else '-')
-        dfs[int(mes_atual) - 2]['Agendamento'] = dfs[int(mes_atual) - 2]['Descrição']
-        dfs[int(mes_atual) - 2]['Agendamento'] = dfs[int(mes_atual) - 2]['Agendamento'].apply(
-            lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
-        dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].fillna('-')
-        dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].astype(dtype='str')
-        dfs[int(mes_atual) - 2]['Lead-Time'] = dfs[int(mes_atual) - 2]['Lead-Time'].astype(dtype='str')
-        dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=df_urano, how='left', on='Número',
-                                           copy=False)
-        dfs[int(mes_atual) - 2] = pd.merge(left=dfs[int(mes_atual) - 2], right=qy_ent, how='left', on='Número')
-        dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2].drop_duplicates(subset=['Número'], keep='first')
-        dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2].fillna('-')
-        dfs[int(mes_atual) - 2]['Emissão_cte'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'] + '!' + \
-                                                 dfs[int(mes_atual) - 2][
-                                                     'Emissão_cte']
-        dfs[int(mes_atual) - 2]['Data_Ocorrência1'] = dfs[int(mes_atual) - 2]['D_Entrega'] + '!' + \
-                                                      dfs[int(mes_atual) - 2][
-                                                          'Data_Ocorrência1']
-        dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2].fillna('-')
-        dfs[int(mes_atual) - 2]['Emissão_cte'] = dfs[int(mes_atual) - 2]['Emissão_cte'].apply(
-            func=lambda val: fatiamento(val))
-        dfs[int(mes_atual) - 2]['Data_Ocorrência1'] = dfs[int(mes_atual) - 2]['Data_Ocorrência1'].apply(
-            func=lambda val: fatiamento(val))
-        dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Emissão_cte']
-        dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['Data_Ocorrência1']
-        dfs[int(mes_atual) - 2] = dfs[int(mes_atual) - 2].fillna('-')
-        dfs[int(mes_atual) - 2]['Lead-Time'] = dfs[int(mes_atual) - 2]['Lead-Time'].apply(
-            func=lambda val: conversor_ldt(val))
-        dfs[int(mes_atual) - 2]['Previsão-Entrega'] = dfs[int(mes_atual) - 2]['Previsão-Entrega'].astype(dtype='str')
-        dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].astype(dtype='str')
-        dfs[int(mes_atual) - 2]['Dias-Para-Entrega'] = dfs[int(mes_atual) - 2]['Previsão-Entrega'] + '!' + \
-                                                       dfs[int(mes_atual) - 2]['D_Entrega'] + '!' + \
-                                                       dfs[int(mes_atual) - 2][
-                                                           'Lead-Time']
-        dfs[int(mes_atual) - 2]['Dias-Para-Entrega'] = dfs[int(mes_atual) - 2]['Dias-Para-Entrega'].apply(
-            func=lambda val: dias_p_entrega(val))
-        dfs[int(mes_atual) - 2]['Data-De-Coleta'] = dfs[int(mes_atual) - 2]['Data-De-Coleta'].apply(
-            lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
-        dfs[int(mes_atual) - 2]['D_Entrega'] = dfs[int(mes_atual) - 2]['D_Entrega'].apply(
-            lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
-        dfs[int(mes_atual) - 2]['Lead-Time'] = dfs[int(mes_atual) - 2]['Lead-Time'].apply(
-            func=lambda val: pd.to_numeric(arg=val, errors='coerce'))
-        dfs[int(mes_atual) - 2]['Lead-Time'] = dfs[int(mes_atual) - 2]['Lead-Time'].fillna('-')
-    except NameError:
-        # Exceção já tratada no IF
-        pass
+            # por algum motivo aqui buga e converte a dfs[int(mes_atual) - 1]['Data-De-Coleta'] para str
+            dfs[ind_mes_a]['Data-De-Coleta'] = dfs[ind_mes_a]['Data-De-Coleta'].apply(
+                func=lambda val: conversor_dt(val))
+            dfs[ind_mes_a] = dfs[ind_mes_a].fillna('-')
+            dfs[ind_mes_a] = pd.merge(left=dfs[ind_mes_a], right=df_col, how='left', on='Número')
+            dfs[ind_mes_a] = dfs[ind_mes_a].fillna('-')
+            dfs[ind_mes_a]['Data-De-Coleta_col'] = dfs[ind_mes_a]['Data-De-Coleta'] + '!' + \
+                                                   dfs[ind_mes_a]['Data-De-Coleta_col']
+            dfs[ind_mes_a]['Data-De-Coleta_col'] = dfs[ind_mes_a]['Data-De-Coleta_col'].apply(
+                func=lambda val: fatiamento(val))
+            dfs[ind_mes_a]['Data-De-Coleta'] = dfs[ind_mes_a]['Data-De-Coleta_col']
+            ssw_mes_m = search_data(name_m_ant)  # DF do mês -1
+            e_ssw1 = ssw_mes_m.query("Ult_Status == ' MERCADORIA ENTREGUE (01)'")  # DF com apenas as notas entregues
+            a_ssw1 = ssw_mes_m.query("Ult_Status == ' ENTREGA AGENDADA (15)'")  # DF com apenas as notas entregues
+            a_ssw1['Descrição'] = a_ssw1['Descrição'].apply(func=lambda val: val[19:26] if len(val) > 5 else '')
+            e_ssw1['Data'] = e_ssw1['Data'].astype(dtype='str', copy=True)
+            e_ssw1['Data'] = e_ssw1['Data'].apply(
+                func=lambda val: val[8:12] + '-' + val[5:7] + '-' + val[:4] if len(val) > 3 else val)
+            ssw_mes_m = ssw_mes_m[['Número', 'Data', 'Cidade/Estado', 'Ult_Status']]
+            ssw_mes_m['Status'] = ssw_mes_m['Ult_Status'] + ' - ' + ssw_mes_m['Cidade/Estado']
+            dfs[ind_mes_a]['Agendamento'] = dfs[ind_mes_a]['Agendamento'].astype(dtype='str',
+                                                                                 copy=True)
+            dfs[ind_mes_a]['D_Entrega'] = dfs[ind_mes_a]['D_Entrega'].astype(dtype='str', copy=True)
+            dfs[ind_mes_a]['D_Entrega'] = dfs[ind_mes_a]['D_Entrega'].apply(
+                func=lambda val: val[8:10] + '-' + val[5:7] + '-' + val[0:4] if len(val) > 3 else val)
+            dfs[ind_mes_a] = pd.merge(left=dfs[ind_mes_a], right=e_ssw1, how='left', on='Número')
+            dfs[ind_mes_a].fillna('-', inplace=True)
+            dfs[ind_mes_a]['Data'] = dfs[ind_mes_a]['Data'].astype(dtype='str', copy=True)
+            dfs[ind_mes_a]['B_data'] = dfs[ind_mes_a]['D_Entrega'] + '!' + dfs[ind_mes_a][
+                'Data']
+            dfs[ind_mes_a]['Data'] = dfs[ind_mes_a]['B_data'].apply(
+                func=lambda val: val[0:11] if len(val) > 11 else val)
+            dfs[ind_mes_a]['Data'] = dfs[ind_mes_a]['Data'].replace(to_replace='!', value='',
+                                                                    regex=True)
+            dfs[ind_mes_a]['D_Entrega'] = dfs[ind_mes_a]['Data']
+            dfs[ind_mes_a] = dfs[ind_mes_a][all_index]
+            dfs[ind_mes_a] = pd.merge(left=dfs[ind_mes_a], right=ssw_mes_m, how='left')
+            dfs[ind_mes_a] = dfs[ind_mes_a][index_stat]
+            dfs[ind_mes_a].columns = all_index
+            dfs[ind_mes_a] = pd.merge(left=dfs[ind_mes_a], right=a_ssw1, how='left', on='Número')
+            dfs[ind_mes_a]['Descrição'] = dfs[ind_mes_a]['Descrição'].fillna('')
+            dfs[ind_mes_a]['Agendamento'] = dfs[ind_mes_a]['Agendamento'].apply(
+                func=lambda val: val[0:10] if len(val) > 4 else '')
+            print("50% concluído")
+            dfs[ind_mes_a]['Descrição'] = dfs[ind_mes_a]['Agendamento'] + '!' + \
+                                          dfs[ind_mes_a][
+                                              'Descrição']
+            dfs[ind_mes_a]['Descrição'] = dfs[ind_mes_a]['Descrição'].replace(to_replace='!',
+                                                                              value='',
+                                                                              regex=True)
+            dfs[ind_mes_a]['Descrição'] = dfs[ind_mes_a]['Descrição'].astype(dtype='str', copy=True)
+            dfs[ind_mes_a]['Descrição'] = dfs[ind_mes_a]['Descrição'].apply(
+                func=lambda val: val[-6:-4] + '-' + val[-4:-2] + '-' + '20' + val[-2:] if len(val) > 1 else '-')
+            dfs[ind_mes_a]['Agendamento'] = dfs[ind_mes_a]['Descrição']
+            dfs[ind_mes_a]['Agendamento'] = dfs[ind_mes_a]['Agendamento'].apply(
+                lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
+            dfs[ind_mes_a]['Data-De-Coleta'] = dfs[ind_mes_a]['Data-De-Coleta'].fillna('-')
+            dfs[ind_mes_a]['Data-De-Coleta'] = dfs[ind_mes_a]['Data-De-Coleta'].astype(dtype='str')
+            dfs[ind_mes_a]['Lead-Time'] = dfs[ind_mes_a]['Lead-Time'].astype(dtype='str')
+            dfs[ind_mes_a] = pd.merge(left=dfs[ind_mes_a], right=df_urano, how='left', on='Número',
+                                      copy=False)
+            dfs[ind_mes_a] = pd.merge(left=dfs[ind_mes_a], right=qy_ent, how='left', on='Número')
+            dfs[ind_mes_a] = dfs[ind_mes_a].drop_duplicates(subset=['Número'], keep='first')
+            dfs[ind_mes_a] = dfs[ind_mes_a].fillna('-')
+            dfs[ind_mes_a] = pd.merge(left=dfs[ind_mes_a], right=df_lead, how='left',
+                                    on=['Cidade-Destinatário', 'Uf', 'Fantasia_Do_Transportador'], copy=False)
+            dfs[ind_mes_a] = dfs[ind_mes_a].drop_duplicates(subset=['Número'], keep='first')
+            dfs[ind_mes_a]['Lead-Time'] = dfs[ind_mes_a]['Lead-Time'].apply(
+                lambda val: pd.to_numeric(val, 'coerce', 'integer'))
+            dfs[ind_mes_a]['Previsão-Entrega'] = dfs[ind_mes_a]['Previsão-Entrega'].astype(
+                dtype='str')
+            dfs[ind_mes_a]['Previsão-Entrega'] = dfs[ind_mes_a]['Previsão-Entrega'].apply(func=lambda val: conversor_dt(val))
+            dfs[ind_mes_a]['D_Entrega'] = dfs[ind_mes_a]['D_Entrega'].astype(dtype='str')
+            dfs[ind_mes_a]['Lead-Time'] = dfs[ind_mes_a]['Lead_Time'].astype(dtype='str')
+            dfs[ind_mes_a]['Dias-Para-Entrega'] = dfs[ind_mes_a]['Previsão-Entrega'] + '!' + \
+                                                  dfs[ind_mes_a]['D_Entrega'] + '!' + \
+                                                  dfs[ind_mes_a][
+                                                      'Lead-Time']
+            dfs[ind_mes_a]['Dias-Para-Entrega'] = dfs[ind_mes_a]['Dias-Para-Entrega'].apply(
+                func=lambda val: dias_p_entrega(val))
+            dfs[ind_mes_a]['Data-De-Coleta'] = dfs[ind_mes_a]['Data-De-Coleta'].apply(
+                lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
+            dfs[ind_mes_a]['D_Entrega'] = dfs[ind_mes_a]['D_Entrega'].apply(
+                lambda _: pd.to_datetime(_, format='%d-%m-%Y', errors='coerce'))
+            dfs[ind_mes_a]['Lead-Time'] = dfs[ind_mes_a]['Lead-Time'].apply(
+                func=lambda val: pd.to_numeric(arg=val, errors='coerce'))
+            dfs[ind_mes_a]['Lead-Time'] = dfs[ind_mes_a]['Lead-Time'].fillna('-')
+        except NameError:
+            # Exceção já tratada no IF
+            pass
 
 print("60% concluído")
 
-dfs[int(mes_atual) - 1]['Data-De-Coleta'] = dfs[int(mes_atual) - 1]['Data-De-Coleta'].apply(
+dfs[ind_mes]['Data-De-Coleta'] = dfs[ind_mes]['Data-De-Coleta'].apply(
     lambda val: to_date_time(val))
 
-dfs[int(mes_atual) - 1] = dfs[int(mes_atual) - 1].fillna('-')
+dfs[ind_mes] = dfs[ind_mes].fillna('-')
 
 ############################
 cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
@@ -594,6 +600,7 @@ while value:
     except PermissionError:
         import time
         import win32com.client as win32
+
         outlook = win32.Dispatch('outlook.application')
         mail = outlook.CreateItem(0)
         mail.To = 'aline.gomes@portoaporto.com.br; luana.neves@portoaporto.com.br'
@@ -601,5 +608,3 @@ while value:
         mail.Body = 'Olá pessoal, aqui é o robô.\n\nEstou tentando excluir o arquivo de monitoramento para colocar um novinho em folha. Preciso que quem está com ele aberto o feche para que eu possa terminar meu trabalho.\n\nMuito obrigado'
         mail.Send()
         time.sleep(300)
-
-

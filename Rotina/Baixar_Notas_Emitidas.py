@@ -1,8 +1,8 @@
-import config
+from Projetos.Rotina import config
 import pyautogui
 import os
 import time
-from config import dataf
+from Projetos.Rotina.config import dataf
 import pygetwindow
 
 time.sleep(5)

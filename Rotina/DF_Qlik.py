@@ -1,5 +1,5 @@
 import pandas as pd
-from config import path_dir_tod, file, dest_path_qlik, ano_atual, meses_str, mes_atual, file_a, all_index, prov_index, \
+from Projetos.Rotina.config import path_dir_tod, file, dest_path_qlik, ano_atual, meses_str, mes_atual, file_a, all_index, prov_index, \
     index_qlik, conversor_dt, fatiamento, to_date_time
 
 path_final = 'C:/Users/patrick.paula/Porto a Porto Comercio de IMP e EXP LTDA/Afonso Marcon - QlikSense_Logistica/Teste.xlsx'

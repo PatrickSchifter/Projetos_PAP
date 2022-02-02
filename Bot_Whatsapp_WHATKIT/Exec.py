@@ -2,43 +2,40 @@ import time
 import pywhatkit
 import pandas as pd
 import os
-from Enviar_email import enviar_email
+from Projetos.Bot_Whatsapp_WHATKIT.Enviar_email import enviar_email
+
 
 def enviar_msg():
+    dir_path = r'K:/CWB/Logistica/Rastreamento/Automacoes/WhatsExpedição/Notas/'
+    path_min = r'C:/Users/patrick.paula/Porto a Porto Comercio de IMP e EXP LTDA\Afonso Marcon - Minutas_Coleta/'
+    cli_path = r'K:/CWB/Logistica/Rastreamento/Automacoes/WhatsExpedição/Clientes.xls'
+    df_rep = r'K:/CWB/Logistica/Rastreamento/Automacoes/WhatsExpedição/Representantes.xlsx'
+    df_resp = r'K:/CWB/Logistica/Rastreamento/Automacoes/WhatsExpedição/Responsaveis.xlsx'
+    df_resp = pd.read_excel(io=df_resp, index_col=0)
+
+    list_min = list(os.listdir(path_min))
+    for item in list_min:
+        try:
+            df_min = pd.read_excel(path_min + item)
+            time.sleep(3)
+            os.remove(path_min + item)
+        except PermissionError:
+            continue
+
+    dfs = []
+    for item in list(os.listdir(dir_path)):
+        df = pd.read_excel(dir_path + item)
+        dfs.append(df)
+
+    for x in range(0, len(dfs)):
+        df_not = pd.concat(objs=dfs, join='outer')
+
+    df_cli = pd.read_excel(cli_path)
+    df_rep = pd.read_excel(df_rep)
+
+    wait_time = 20
+
     try:
-        dir_path = r'K:/CWB/Logistica/Rastreamento/Automacoes/WhatsExpedição/Notas/'
-        path_min = r'C:/Users/patrick.paula/Porto a Porto Comercio de IMP e EXP LTDA\Afonso Marcon - Minutas_Coleta/'
-        cli_path = r'K:/CWB/Logistica/Rastreamento/Automacoes/WhatsExpedição/Clientes.xls'
-        df_rep = r'K:/CWB/Logistica/Rastreamento/Automacoes/WhatsExpedição/Representantes.xlsx'
-        df_resp = r'K:/CWB/Logistica/Rastreamento/Automacoes/WhatsExpedição/Responsaveis.xlsx'
-        df_resp = pd.read_excel(io=df_resp, index_col=0)
-
-        list_min = list(os.listdir(path_min))
-        for item in list_min:
-            try:
-                df_min = pd.read_excel(path_min + item)
-                time.sleep(3)
-                if len(list_min) > 2:
-                    item = list_min[1]
-                    os.remove(path_min + item)
-                    continue
-            except PermissionError:
-                continue
-
-        dfs = []
-        for item in list(os.listdir(dir_path)):
-                df = pd.read_excel(dir_path + item)
-                dfs.append(df)
-
-        for x in range(0, len(dfs)):
-            df_not = pd.concat(objs=dfs, join='outer')
-
-
-        df_cli = pd.read_excel(cli_path)
-        df_rep = pd.read_excel(df_rep)
-
-        wait_time = 20
-
         try:
             df_min.columns = ['Número', 'Data']
         except ValueError:
@@ -53,7 +50,8 @@ def enviar_msg():
         print(frame)
         frame = frame.fillna('0')
         frame = frame.query("Destinatário != '0'")
-        df_cli.columns = ['Destinatário', 'Fantasia', 'Razão Social', 'CNPJ/CPF', 'Cidade', 'UF', 'Fone', 'Celular Cliente',
+        df_cli.columns = ['Destinatário', 'Fantasia', 'Razão Social', 'CNPJ/CPF', 'Cidade', 'UF', 'Fone',
+                          'Celular Cliente',
                           'E-mail Corporativo', 'Situação', 'Tipo Cliente', 'Grupo Econômico', 'Nota']
         frame = pd.merge(left=frame, right=df_cli, how='left', on='Destinatário')
         frame = pd.merge(left=frame, right=df_rep, how='left', on='Fantasia Comissionado')
@@ -104,9 +102,6 @@ def enviar_msg():
             else:
                 msg = ''
                 continue
-
-        enviar_email(df_resp.loc[representante]['email'], body_email)
-    except:
+    except UnboundLocalError:
         pass
-
-
+    enviar_email(df_resp.loc[representante]['email'], body_email)
