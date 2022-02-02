@@ -4,6 +4,13 @@ from datetime import date
 import pygetwindow
 import pandas as pd
 
+endpoint_everest = 'https://producao.acomsistemas.com.br/api/dfi/notaemitida?emissao_inicial=2022%2F01%2F17&emissao_final=2022%2F01%2F17&x-Entidade=2020005&x-Pagina=1'
+entidade_endpoint_everest = '2020005'
+user_everest = 'PORTOAPORTO2022'
+password_everest = 'POR1355'
+header_everest = {'Authorization': 'Basic UE9SVE9BUE9SVE8yMDIyOlBPUjEzNTU='}
+token_jadlog = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOjEwMjgzNSwiZHQiOiIyMDIxMDMxNCJ9.M0ahvMZQ4-HOWDqFWe3Og05ZTeIhvQxkppcIWau1iKs'
+endpoint_jadlog = 'http://www.jadlog.com.br/embarcador/api/tracking/consultar'
 dir_coletas = r'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/Automação de Monitoramento/Coletados/'
 dir_arq_coletas = r'K:/CWB/Logistica/Rastreamento/Controle_Monitoramento/Automação de Monitoramento/Coletados/Arquivo/'
 separador = "#" * 500

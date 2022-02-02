@@ -2,16 +2,9 @@ import requests
 import simplejson
 import certifi
 import pandas as pd
+from Projetos.Rotina.config import endpoint_everest as endpoint_pr
+from Projetos.Rotina.config import header_everest as header
 
-endpoint_pr = 'https://producao.acomsistemas.com.br/api/dfi/notaemitida?emissao_inicial=2022%2F01%2F17&emissao_final=2022%2F01%2F17&x-Entidade=2020005&x-Pagina=1'
-endpoint = 'http://homologacao.acomsistemas.com.br:80/api/adv/prenota/empresa/1?x-Pagina=1&data_inicial=2022%2F01%2F10&data_final=2022%2F01%2F10&x-Entidade=2020154'
-
-entidade_pr = '2020005'
-entidade = '2020154'
-user = 'PORTOAPORTO2022'
-password = 'POR1355'
-
-header = {'Authorization': 'Basic UE9SVE9BUE9SVE8yMDIyOlBPUjEzNTU='}
 header = simplejson.dumps(header)
 header = simplejson.loads(header)
 
@@ -22,4 +15,3 @@ print(request.content)
 
 # df = pd.DataFrame(request.text.split('['))
 # print(df.columns)
-

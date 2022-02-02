@@ -3,8 +3,9 @@ import pandas as pd
 from config import conversor_dt, to_date_time
 import time
 import simplejson
-
-from config import meses_str, mes_atual, ano_atual, path_dir_tod, dia_atual
+from Projetos.Rotina.config import token_jadlog as token
+from Projetos.Rotina.config import endpoint_jadlog as endpoint
+from Projetos.Rotina.config import meses_str, mes_atual, ano_atual, path_dir_tod, dia_atual
 
 mes_atual = str(int(mes_atual))
 if dia_atual == '01':
@@ -34,8 +35,6 @@ df_ga_m = pd.read_excel(io=file_ga, sheet_name=sheet_a)
 df_ga_m = df_ga_m.fillna('-')
 df_ga_m = df_ga_m.query("D_Entrega == '-'")
 
-token = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOjEwMjgzNSwiZHQiOiIyMDIxMDMxNCJ9.M0ahvMZQ4-HOWDqFWe3Og05ZTeIhvQxkppcIWau1iKs'
-endpoint = 'http://www.jadlog.com.br/embarcador/api/tracking/consultar'
 
 cnpj = "26253785000106"
 
